@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:form_flow/view/form_screen/widgets/date_field.dart';
 import 'package:form_flow/view/form_screen/widgets/drop_down_menu.dart';
 import 'package:intl/intl.dart';
 
@@ -141,7 +141,7 @@ class _FormScreenState extends State<FormScreen> {
             Row(
               children: [
                 Expanded(
-                  child: _buildDateField(
+                  child: buildDateField(
                     label: 'From Date',
                     date: _fromDate,
                     onTap: () => _selectFromDate(context),
@@ -149,7 +149,7 @@ class _FormScreenState extends State<FormScreen> {
                 ),
                 SizedBox(width: 16),
                 Expanded(
-                  child: _buildDateField(
+                  child: buildDateField(
                     label: 'To Date',
                     date: _toDate,
                     onTap: () => _selectToDate(context),
@@ -195,47 +195,6 @@ class _FormScreenState extends State<FormScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDateField({
-    required String label,
-    required DateTime? date,
-    required Function() onTap,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-        ),
-        SizedBox(height: 4),
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.calendar_today, size: 20, color: Colors.grey[600]),
-                SizedBox(width: 8),
-                Text(
-                  date != null
-                      ? DateFormat('yyyy-MM-dd').format(date)
-                      : 'Select $label',
-                  style: TextStyle(
-                    color: date != null ? Colors.black : Colors.grey[400],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 
