@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../app_state.dart';
@@ -11,10 +12,10 @@ class AddEditDialog extends StatefulWidget {
   final SupplierData? editData;
 
   const AddEditDialog({
-    Key? key,
+    super.key,
     required this.mode,
     this.editData,
-  }) : super(key: key);
+  });
 
   @override
   _AddEditDialogState createState() => _AddEditDialogState();
@@ -22,7 +23,7 @@ class AddEditDialog extends StatefulWidget {
 
 class _AddEditDialogState extends State<AddEditDialog> {
   final _formKey = GlobalKey<FormState>();
-  
+
   String? _supplierName;
   String? _storageName;
   final _carIdController = TextEditingController();
@@ -95,7 +96,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
     final DateTime now = DateTime.now();
     final DateTime? date = await showDatePicker(
       context: context,
-      initialDate: isArriveDate ? _actualArriveDate ?? now : _actualLeaveDate ?? now,
+      initialDate:
+          isArriveDate ? _actualArriveDate ?? now : _actualLeaveDate ?? now,
       firstDate: now,
       lastDate: now.add(Duration(days: 365)),
     );
@@ -133,9 +135,12 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return;
     }
 
-    if (_supplierName == null || _storageName == null || 
-        _procurementSpecialist == null || _supervisorName == null ||
-        _actualArriveDate == null || _actualLeaveDate == null) {
+    if (_supplierName == null ||
+        _storageName == null ||
+        _procurementSpecialist == null ||
+        _supervisorName == null ||
+        _actualArriveDate == null ||
+        _actualLeaveDate == null) {
       Get.snackbar(
         'Error',
         'Please fill in all fields',
@@ -166,7 +171,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return;
     }
 
-    if (_actualLeaveDate!.isBefore(_actualArriveDate!) || 
+    if (_actualLeaveDate!.isBefore(_actualArriveDate!) ||
         _actualLeaveDate!.isAtSameMomentAs(_actualArriveDate!)) {
       Get.snackbar(
         'Error',
@@ -188,12 +193,12 @@ class _AddEditDialogState extends State<AddEditDialog> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(isSave 
-          ? 'Are you sure you want to save?' 
-          : 'Are you sure you want to cancel?'),
-        content: Text(isSave 
-          ? 'This will save the current data to the table.' 
-          : 'Any unsaved changes will be lost.'),
+        title: Text(isSave
+            ? 'Are you sure you want to save?'
+            : 'Are you sure you want to cancel?'),
+        content: Text(isSave
+            ? 'This will save the current data to the table.'
+            : 'Any unsaved changes will be lost.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -216,7 +221,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
 
   void _performSave() {
     final record = SupplierData(
-      id: widget.editData?.id ?? 0, // Will be set by AppState
+      id: widget.editData?.id ?? 0,
+      // Will be set by AppState
       supplierName: _supplierName!,
       storageName: _storageName!,
       carId: _carIdController.text,
@@ -226,7 +232,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
       actualLeaveDate: _actualLeaveDate!,
     );
 
-    final controller = Get.find<AppController>();
+    final controller = Get.find<DashboardController>();
     if (widget.mode == DialogMode.add) {
       controller.addRecord(record);
     } else {
@@ -261,9 +267,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ),
             SizedBox(height: 8),
             Text(
-              widget.mode == DialogMode.add 
-                ? 'Fill in all fields to create a new supply chain record.'
-                : 'Update the fields below to modify the existing record.',
+              widget.mode == DialogMode.add
+                  ? 'Fill in all fields to create a new supply chain record.'
+                  : 'Update the fields below to modify the existing record.',
               style: TextStyle(
                 color: Colors.grey.shade600,
               ),
@@ -296,7 +302,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                   _supplierName = value;
                                 });
                               },
-                              validator: (value) => value == null ? 'Please select a supplier' : null,
+                              validator: (value) => value == null
+                                  ? 'Please select a supplier'
+                                  : null,
                             ),
                           ),
                           SizedBox(width: 16),
@@ -318,7 +326,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                   _storageName = value;
                                 });
                               },
-                              validator: (value) => value == null ? 'Please select a storage' : null,
+                              validator: (value) => value == null
+                                  ? 'Please select a storage'
+                                  : null,
                             ),
                           ),
                         ],
@@ -350,7 +360,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                 labelText: 'Procurement Specialist',
                                 border: OutlineInputBorder(),
                               ),
-                              items: _procurementSpecialists.map((String specialist) {
+                              items: _procurementSpecialists
+                                  .map((String specialist) {
                                 return DropdownMenuItem<String>(
                                   value: specialist,
                                   child: Text(specialist),
@@ -361,7 +372,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                   _procurementSpecialist = value;
                                 });
                               },
-                              validator: (value) => value == null ? 'Please select a specialist' : null,
+                              validator: (value) => value == null
+                                  ? 'Please select a specialist'
+                                  : null,
                             ),
                           ),
                         ],
@@ -387,11 +400,14 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                   _supervisorName = value;
                                 });
                               },
-                              validator: (value) => value == null ? 'Please select a supervisor' : null,
+                              validator: (value) => value == null
+                                  ? 'Please select a supervisor'
+                                  : null,
                             ),
                           ),
                           SizedBox(width: 16),
-                          Expanded(child: Container()), // Empty space for alignment
+                          Expanded(child: Container()),
+                          // Empty space for alignment
                         ],
                       ),
                       SizedBox(height: 16),
@@ -408,8 +424,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                 ),
                                 child: Text(
                                   _actualArriveDate != null
-                                    ? DateFormat('yyyy-MM-dd HH:mm').format(_actualArriveDate!)
-                                    : 'Select date and time',
+                                      ? DateFormat('yyyy-MM-dd HH:mm')
+                                          .format(_actualArriveDate!)
+                                      : 'Select date and time',
                                 ),
                               ),
                             ),
@@ -426,8 +443,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                 ),
                                 child: Text(
                                   _actualLeaveDate != null
-                                    ? DateFormat('yyyy-MM-dd HH:mm').format(_actualLeaveDate!)
-                                    : 'Select date and time',
+                                      ? DateFormat('yyyy-MM-dd HH:mm')
+                                          .format(_actualLeaveDate!)
+                                      : 'Select date and time',
                                 ),
                               ),
                             ),

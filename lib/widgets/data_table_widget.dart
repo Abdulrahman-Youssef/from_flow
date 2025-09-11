@@ -10,13 +10,13 @@ class DataTableWidget extends StatelessWidget {
   final DateTime selectedDate;
   final Function(DateTime) onDateChange;
   final VoidCallback onAddNew;
-  final Function(SupplierData) onEdit;
+  final Function(SupplierData, BuildContext) onEdit;
   final Function(int) onCopy;
   final Function(SupplierData) onDelete;
   final VoidCallback onSave;
 
   const DataTableWidget({
-    Key? key,
+    super.key,
     required this.data,
     required this.selectedDate,
     required this.onDateChange,
@@ -25,7 +25,7 @@ class DataTableWidget extends StatelessWidget {
     required this.onCopy,
     required this.onDelete,
     required this.onSave,
-  }) : super(key: key);
+  });
 
   String _formatDateTime(DateTime dateTime) {
     return DateFormat('MM/dd/yyyy HH:mm').format(dateTime);
@@ -298,7 +298,7 @@ class DataTableWidget extends StatelessWidget {
                             children: [
                               IconButton(
                                 icon: Icon(Icons.edit, size: 16),
-                                onPressed: () => onEdit(item),
+                                onPressed: () => onEdit(item, context),
                                 tooltip: 'Edit record',
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.blue.shade50,
