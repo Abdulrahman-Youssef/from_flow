@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import '../models/supplier_data.dart';
+import 'package:file_picker/file_picker.dart';
 
 class DataTableWidget extends StatelessWidget {
   final List<SupplierData> data;
@@ -28,54 +28,40 @@ class DataTableWidget extends StatelessWidget {
   });
 
   String _formatDateTime(DateTime dateTime) {
-    return DateFormat('MM/dd/yyyy HH:mm').format(dateTime);
+    return DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
   }
 
   Future<void> _handleExport(BuildContext context) async {
     try {
-      final directory = await getApplicationDocumentsDirectory();
-      final fileName =
-          'supply-chain-data-${DateFormat('yyyy-MM-dd').format(selectedDate)}.csv';
-      final file = File('${directory.path}/$fileName');
+      // First prepare the CSV content in memory
+      final String csvContent = _generateCsvContent();
 
-      final headers = [
-        'Row Number',
-        'Date',
-        'Supplier Name',
-        'Storage Name',
-        'Car ID',
-        'Procurement Specialist',
-        'Supervisor Name',
-        'Actual Arrive Date',
-        'Actual Leave Date',
-        'Waiting Days'
-      ];
+      // Show the save file dialog
+      String? savePath = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save CSV Export',
+        fileName:
+            'supply-chain-data-${DateFormat('yyyy-MM-dd').format(selectedDate)}.csv',
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+      );
 
-      final csvContent = StringBuffer();
-      csvContent.writeln(headers.join(','));
-
-      for (int i = 0; i < data.length; i++) {
-        final item = data[i];
-        final row = [
-          (i + 1).toString(),
-          DateFormat('yyyy-MM-dd').format(selectedDate),
-          '"${item.supplierName}"',
-          '"${item.storageName}"',
-          item.carId,
-          '"${item.procurementSpecialist}"',
-          '"${item.supervisorName}"',
-          '"${_formatDateTime(item.actualArriveDate)}"',
-          '"${_formatDateTime(item.actualLeaveDate)}"',
-          item.waitingDays.toString()
-        ];
-        csvContent.writeln(row.join(','));
+      // If user cancelled the dialog, do nothing
+      if (savePath == null || savePath.isEmpty) {
+        return;
       }
 
-      await file.writeAsString(csvContent.toString());
+      // Ensure the file has .csv extension
+      if (!savePath.endsWith('.csv')) {
+        savePath = '$savePath.csv';
+      }
+
+      // Write the file to the selected path
+      final file = File(savePath);
+      await file.writeAsString(csvContent);
 
       Get.snackbar(
         'Success',
-        'Excel file exported successfully for ${DateFormat('yyyy-MM-dd').format(selectedDate)}',
+        'Excel file exported successfully to: ${file.path}',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
@@ -87,6 +73,44 @@ class DataTableWidget extends StatelessWidget {
         colorText: Colors.white,
       );
     }
+  }
+
+// Helper function to generate CSV content
+  String _generateCsvContent() {
+    final headers = [
+      'Row Number',
+      'Shipment Date',
+      'Supplier Name',
+      'Storage Name',
+      'Vehicle NO',
+      'Procurement Specialist',
+      'fleet supervisor',
+      'Actual Arrive Date',
+      'Actual Departure Date',
+      'Waiting hours'
+    ];
+
+    final csvContent = StringBuffer();
+    csvContent.writeln(headers.join(','));
+
+    for (int i = 0; i < data.length; i++) {
+      final item = data[i];
+      final row = [
+        (i + 1).toString(),
+        DateFormat('dd/MM/yyyy').format(selectedDate),
+        '"${item.supplierName}"',
+        '"${item.storageName}"',
+        item.vehicleCode,
+        '"${item.procurementSpecialist}"',
+        '"${item.fleetSupervisor}"',
+        '"${_formatDateTime(item.actualArriveDate)}"',
+        '"${_formatDateTime(item.actualDepartureDate)}"',
+        item.waitingTime
+      ];
+      csvContent.writeln(row.join(','));
+    }
+
+    return csvContent.toString();
   }
 
   @override
@@ -143,7 +167,7 @@ class DataTableWidget extends StatelessWidget {
                           }
                         },
                         child: Text(
-                          DateFormat('yyyy-MM-dd').format(selectedDate),
+                          DateFormat('dd/MM/yyyy').format(selectedDate),
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w500,
@@ -210,7 +234,7 @@ class DataTableWidget extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: SingleChildScrollView(
                 child: DataTable(
-                  headingRowColor: MaterialStateColor.resolveWith(
+                  headingRowColor: WidgetStateColor.resolveWith(
                     (states) => Color(0xFFF9FAFB),
                   ),
                   columns: [
@@ -224,22 +248,22 @@ class DataTableWidget extends StatelessWidget {
                         label: Text('Storage Name',
                             style: TextStyle(fontWeight: FontWeight.w600))),
                     DataColumn(
-                        label: Text('Car ID',
+                        label: Text('vehicle NO',
                             style: TextStyle(fontWeight: FontWeight.w600))),
                     DataColumn(
                         label: Text('Procurement Specialist',
                             style: TextStyle(fontWeight: FontWeight.w600))),
                     DataColumn(
-                        label: Text('Supervisor\'s Name',
+                        label: Text('fleet Supervisor',
                             style: TextStyle(fontWeight: FontWeight.w600))),
                     DataColumn(
                         label: Text('Actual Arrive Date',
                             style: TextStyle(fontWeight: FontWeight.w600))),
                     DataColumn(
-                        label: Text('Actual Leave Date',
+                        label: Text('Actual Departure Date',
                             style: TextStyle(fontWeight: FontWeight.w600))),
                     DataColumn(
-                        label: Text('Waiting Days',
+                        label: Text('Waiting Hours',
                             style: TextStyle(fontWeight: FontWeight.w600))),
                     DataColumn(
                         label: Text('Actions',
@@ -268,16 +292,16 @@ class DataTableWidget extends StatelessWidget {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
+                              color: Colors.grey.shade500,
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: Text(item.carId),
+                            child: Text(item.vehicleCode),
                           ),
                         ),
                         DataCell(Text(item.procurementSpecialist)),
-                        DataCell(Text(item.supervisorName)),
+                        DataCell(Text(item.fleetSupervisor)),
                         DataCell(Text(_formatDateTime(item.actualArriveDate))),
-                        DataCell(Text(_formatDateTime(item.actualLeaveDate))),
+                        DataCell(Text(_formatDateTime(item.actualDepartureDate))),
                         DataCell(
                           Container(
                             padding: EdgeInsets.symmetric(
@@ -287,7 +311,7 @@ class DataTableWidget extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              '${item.waitingDays} days',
+                              '${item.waitingTime} Hours:mints',
                               style: TextStyle(color: Colors.blue.shade700),
                             ),
                           ),

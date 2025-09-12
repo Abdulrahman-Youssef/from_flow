@@ -2,21 +2,21 @@ class SupplierData {
   final int id;
   final String supplierName;
   final String storageName;
-  final String carId;
+  final String vehicleCode;
   final String procurementSpecialist;
-  final String supervisorName;
+  final String fleetSupervisor;
   final DateTime actualArriveDate;
-  final DateTime actualLeaveDate;
+  final DateTime actualDepartureDate;
 
   SupplierData({
     required this.id,
     required this.supplierName,
     required this.storageName,
-    required this.carId,
+    required this.vehicleCode,
     required this.procurementSpecialist,
-    required this.supervisorName,
+    required this.fleetSupervisor,
     required this.actualArriveDate,
-    required this.actualLeaveDate,
+    required this.actualDepartureDate,
   });
 
   SupplierData copyWith({
@@ -33,15 +33,20 @@ class SupplierData {
       id: id ?? this.id,
       supplierName: supplierName ?? this.supplierName,
       storageName: storageName ?? this.storageName,
-      carId: carId ?? this.carId,
-      procurementSpecialist: procurementSpecialist ?? this.procurementSpecialist,
-      supervisorName: supervisorName ?? this.supervisorName,
+      vehicleCode: carId ?? this.vehicleCode,
+      procurementSpecialist:
+          procurementSpecialist ?? this.procurementSpecialist,
+      fleetSupervisor: supervisorName ?? this.fleetSupervisor,
       actualArriveDate: actualArriveDate ?? this.actualArriveDate,
-      actualLeaveDate: actualLeaveDate ?? this.actualLeaveDate,
+      actualDepartureDate: actualLeaveDate ?? this.actualDepartureDate,
     );
   }
 
-  int get waitingDays {
-    return actualLeaveDate.difference(actualArriveDate).inDays;
+  String get waitingTime {
+    final difference = actualDepartureDate.difference(actualArriveDate);
+    final hours = difference.inHours;
+    final minutes = difference.inMinutes.remainder(60);
+
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
   }
 }

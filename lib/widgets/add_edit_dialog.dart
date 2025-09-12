@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/controller/dashboard_controller.dart';
+import 'package:form_flow/core/data/constant/data_lists.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../app_state.dart';
@@ -26,31 +27,18 @@ class _AddEditDialogState extends State<AddEditDialog> {
 
   String? _supplierName;
   String? _storageName;
+  String? _vehicleCode;
   final _carIdController = TextEditingController();
   String? _procurementSpecialist;
   String? _supervisorName;
   DateTime? _actualArriveDate;
   DateTime? _actualLeaveDate;
 
-  final List<String> _supplierOptions = [
-    "ABC Logistics Co.",
-    "Global Supply Ltd.",
-    "Quick Transport Inc.",
-    "Reliable Freight",
-    "Express Delivery Co.",
-    "Prime Logistics",
-    "Swift Transport"
-  ];
+  final List<String> _supplierOptions = DataLists.suppliers;
 
-  final List<String> _storageOptions = [
-    "Warehouse A",
-    "Storage Facility B",
-    "Warehouse C",
-    "Storage Unit D",
-    "Warehouse E",
-    "Central Storage",
-    "Distribution Center"
-  ];
+  final List<String> _storageOptions = DataLists.warehouses;
+
+  final List<String> _vehicleNOOptions = DataLists.vehicleCodes;
 
   final List<String> _procurementSpecialists = [
     "John Smith",
@@ -62,15 +50,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
     "Sarah Brown"
   ];
 
-  final List<String> _supervisors = [
-    "Sarah Johnson",
-    "Michael Brown",
-    "Lisa Anderson",
-    "Jennifer Taylor",
-    "Kevin Miller",
-    "Rachel Davis",
-    "Thomas Wilson"
-  ];
+  final List<String> _fleetSupervisor = DataLists.fleetSupervisors;
 
   @override
   void initState() {
@@ -78,11 +58,11 @@ class _AddEditDialogState extends State<AddEditDialog> {
     if (widget.mode == DialogMode.edit && widget.editData != null) {
       _supplierName = widget.editData!.supplierName;
       _storageName = widget.editData!.storageName;
-      _carIdController.text = widget.editData!.carId;
+      _vehicleCode = widget.editData!.vehicleCode;
       _procurementSpecialist = widget.editData!.procurementSpecialist;
-      _supervisorName = widget.editData!.supervisorName;
+      _supervisorName = widget.editData!.fleetSupervisor;
       _actualArriveDate = widget.editData!.actualArriveDate;
-      _actualLeaveDate = widget.editData!.actualLeaveDate;
+      _actualLeaveDate = widget.editData!.actualDepartureDate;
     }
   }
 
@@ -225,11 +205,11 @@ class _AddEditDialogState extends State<AddEditDialog> {
       // Will be set by AppState
       supplierName: _supplierName!,
       storageName: _storageName!,
-      carId: _carIdController.text,
+      vehicleCode: _vehicleCode!,
       procurementSpecialist: _procurementSpecialist!,
-      supervisorName: _supervisorName!,
+      fleetSupervisor: _supervisorName!,
       actualArriveDate: _actualArriveDate!,
-      actualLeaveDate: _actualLeaveDate!,
+      actualDepartureDate: _actualLeaveDate!,
     );
 
     final controller = Get.find<DashboardController>();
@@ -286,7 +266,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _supplierName,
+                              initialValue: _supplierName,
                               decoration: InputDecoration(
                                 labelText: 'Supplier Name',
                                 border: OutlineInputBorder(),
@@ -310,7 +290,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
                           SizedBox(width: 16),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _storageName,
+                              initialValue: _storageName,
                               decoration: InputDecoration(
                                 labelText: 'Storage Name',
                                 border: OutlineInputBorder(),
@@ -337,25 +317,33 @@ class _AddEditDialogState extends State<AddEditDialog> {
                       Row(
                         children: [
                           Expanded(
-                            child: TextFormField(
-                              controller: _carIdController,
+                            child: DropdownButtonFormField<String>(
+                              initialValue: _vehicleCode,
                               decoration: InputDecoration(
                                 labelText: 'Car ID',
                                 hintText: 'Enter Car ID',
                                 border: OutlineInputBorder(),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter Car ID';
-                                }
-                                return null;
+                              items: _vehicleNOOptions.map((String vehicleNO) {
+                                return DropdownMenuItem<String>(
+                                  value: vehicleNO,
+                                  child: Text(vehicleNO),
+                                );
+                              }).toList(),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  _vehicleCode = value;
+                                });
                               },
+                              validator: (value) => value == null
+                                  ? 'Please select a vehicle Number'
+                                  : null,
                             ),
                           ),
                           SizedBox(width: 16),
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _procurementSpecialist,
+                              initialValue: _procurementSpecialist,
                               decoration: InputDecoration(
                                 labelText: 'Procurement Specialist',
                                 border: OutlineInputBorder(),
@@ -384,12 +372,12 @@ class _AddEditDialogState extends State<AddEditDialog> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<String>(
-                              value: _supervisorName,
+                              initialValue: _supervisorName,
                               decoration: InputDecoration(
-                                labelText: 'Supervisor\'s Name',
+                                labelText: 'Fleet Supervisor',
                                 border: OutlineInputBorder(),
                               ),
-                              items: _supervisors.map((String supervisor) {
+                              items: _fleetSupervisor.map((String supervisor) {
                                 return DropdownMenuItem<String>(
                                   value: supervisor,
                                   child: Text(supervisor),
@@ -424,7 +412,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                 ),
                                 child: Text(
                                   _actualArriveDate != null
-                                      ? DateFormat('yyyy-MM-dd HH:mm')
+                                      ? DateFormat('dd-mm-yyyy HH:mm')
                                           .format(_actualArriveDate!)
                                       : 'Select date and time',
                                 ),
@@ -443,7 +431,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
                                 ),
                                 child: Text(
                                   _actualLeaveDate != null
-                                      ? DateFormat('yyyy-MM-dd HH:mm')
+                                      ? DateFormat('dd-mm-yyyy HH:mm')
                                           .format(_actualLeaveDate!)
                                       : 'Select date and time',
                                 ),
