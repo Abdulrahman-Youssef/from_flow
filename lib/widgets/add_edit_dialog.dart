@@ -8,11 +8,11 @@ import '../models/supplier_data.dart';
 
 enum DialogMode { add, edit }
 
-class AddEditDialog extends StatefulWidget {
+class AddEditDialog1 extends StatefulWidget {
   final DialogMode mode;
   final SupplierData? editData;
 
-  const AddEditDialog({
+  const AddEditDialog1({
     super.key,
     required this.mode,
     this.editData,
@@ -22,7 +22,7 @@ class AddEditDialog extends StatefulWidget {
   _AddEditDialogState createState() => _AddEditDialogState();
 }
 
-class _AddEditDialogState extends State<AddEditDialog> {
+class _AddEditDialogState extends State<AddEditDialog1> {
   final _formKey = GlobalKey<FormState>();
 
   String? _supplierName;

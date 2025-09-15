@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/app_state.dart';
 import 'package:get/get.dart';
-
 import '../models/supplier_data.dart';
-import '../widgets/add_edit_dialog.dart';
+import '../widgets/add_edit_dialog.dart' hide DialogMode;
+import '../widgets/temp_dialogs/try1.dart';
 
 class DashboardController extends GetxController {
   var data = <SupplierData>[
