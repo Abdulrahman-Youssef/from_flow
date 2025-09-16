@@ -5,6 +5,8 @@ import '../app_state.dart';
 import '../widgets/data_table_widget.dart';
 import '../widgets/add_edit_dialog.dart';
 import '../models/supplier_data.dart';
+import '../widgets/temp_table/table try1.dart';
+import '../widgets/temp_table/table try2.dart';
 
 class DashboardScreen extends StatelessWidget {
   DashboardScreen({super.key});

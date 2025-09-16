@@ -1,12 +1,13 @@
 // import 'package:flutter/material.dart';
+// import 'package:form_flow/models/supplier_data.dart';
 // import 'package:get/get.dart';
 // import 'package:intl/intl.dart';
 // import 'dart:io';
 // import 'package:file_picker/file_picker.dart';
 //
-// import '../models/trip_data.dart';
-//
 // class DataTableWidget1 extends StatelessWidget {
+//
+//
 //   final List<trip> data;
 //   final DateTime selectedDate;
 //   final Function(DateTime) onDateChange;
@@ -41,7 +42,7 @@
 //       String? savePath = await FilePicker.platform.saveFile(
 //         dialogTitle: 'Save CSV Export',
 //         fileName:
-//             'supply-chain-data-${DateFormat('yyyy-MM-dd').format(selectedDate)}.csv',
+//         'supply-chain-data-${DateFormat('yyyy-MM-dd').format(selectedDate)}.csv',
 //         type: FileType.custom,
 //         allowedExtensions: ['csv'],
 //       );
@@ -194,7 +195,7 @@
 //                           foregroundColor: Colors.white,
 //                           elevation: 0,
 //                           padding:
-//                               EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+//                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
 //                         ),
 //                       ),
 //                       SizedBox(width: 8),
@@ -207,7 +208,7 @@
 //                           foregroundColor: Colors.white,
 //                           elevation: 0,
 //                           padding:
-//                               EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+//                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
 //                         ),
 //                       ),
 //                       SizedBox(width: 8),
@@ -220,7 +221,7 @@
 //                           foregroundColor: Colors.white,
 //                           elevation: 0,
 //                           padding:
-//                               EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+//                           EdgeInsets.symmetric(horizontal: 12, vertical: 8),
 //                         ),
 //                       ),
 //                     ],
@@ -236,7 +237,7 @@
 //               child: SingleChildScrollView(
 //                 child: DataTable(
 //                   headingRowColor: WidgetStateColor.resolveWith(
-//                     (states) => Color(0xFFF9FAFB),
+//                         (states) => Color(0xFFF9FAFB),
 //                   ),
 //                   columns: [
 //                     DataColumn(

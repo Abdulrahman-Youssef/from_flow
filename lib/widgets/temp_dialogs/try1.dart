@@ -2,26 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:form_flow/core/data/constant/data_lists.dart';
 import 'package:form_flow/models/supplier_data.dart';
+import 'package:form_flow/models/trip_data.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 enum DialogMode { add, edit }
 
-class SupplierEntry {
-  String? supplierName;
-  DateTime? actualArriveDate;
-  DateTime? actualLeaveDate;
-
-  SupplierEntry({
-    this.supplierName,
-    this.actualArriveDate,
-    this.actualLeaveDate,
-  });
-}
-
 class AddEditDialog extends StatefulWidget {
   final DialogMode mode;
-  final SupplierData? editData;
+  final TripData? editData;
 
   const AddEditDialog({
     super.key,
@@ -43,7 +32,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
   String? _supervisorName;
 
   // Section 2: Suppliers List
-  List<SupplierEntry> _suppliers = [SupplierEntry()];
+  List<SupplierData> _suppliers = [SupplierData()];
 
   final List<String> _supplierOptions = DataLists.suppliers;
   final List<String> _storageOptions = DataLists.warehouses;
@@ -68,26 +57,21 @@ class _AddEditDialogState extends State<AddEditDialog> {
       _procurementSpecialist = widget.editData!.procurementSpecialist;
       _supervisorName = widget.editData!.fleetSupervisor;
 
+
       // Initialize with existing supplier data
-      _suppliers = [
-        SupplierEntry(
-          supplierName: widget.editData!.supplierName,
-          actualArriveDate: widget.editData!.actualArriveDate,
-          actualLeaveDate: widget.editData!.actualDepartureDate,
-        )
-      ];
+     _suppliers = widget.editData!.suppliers;
     }
   }
 
   Future<void> _selectDateTime(BuildContext context, int supplierIndex, bool isArriveDate) async {
     final DateTime now = DateTime.now();
-    final SupplierEntry supplier = _suppliers[supplierIndex];
+    final SupplierData supplier = _suppliers[supplierIndex];
 
     final DateTime? date = await showDatePicker(
       context: context,
       initialDate: isArriveDate
           ? supplier.actualArriveDate ?? now
-          : supplier.actualLeaveDate ?? now,
+          : supplier.actualDepartureDate ?? now,
       firstDate: now,
       lastDate: now.add(Duration(days: 365)),
     );
@@ -98,7 +82,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
         initialTime: TimeOfDay.fromDateTime(
           isArriveDate
               ? supplier.actualArriveDate ?? now
-              : supplier.actualLeaveDate ?? now,
+              : supplier.actualDepartureDate ?? now,
         ),
       );
 
@@ -113,9 +97,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
 
         setState(() {
           if (isArriveDate) {
-            _suppliers[supplierIndex].actualArriveDate = selectedDateTime;
+            _suppliers[supplierIndex].actualArriveDate  =selectedDateTime ;
           } else {
-            _suppliers[supplierIndex].actualLeaveDate = selectedDateTime;
+            _suppliers[supplierIndex].actualDepartureDate =selectedDateTime;
           }
         });
       }
@@ -124,7 +108,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
 
   void _addAnotherSupplier(){
     setState(() {
-      _suppliers.add(SupplierEntry());
+      _suppliers.add(SupplierData());
     });
   }
 
@@ -136,7 +120,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
     }
   }
 
-  bool _validateSupplier(SupplierEntry supplier, int index) {
+  bool _validateSupplier(SupplierData supplier, int index) {
     if (supplier.supplierName == null) {
       Get.snackbar(
         'Error',
@@ -157,7 +141,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return false;
     }
 
-    if (supplier.actualLeaveDate == null) {
+    if (supplier.actualDepartureDate == null) {
       Get.snackbar(
         'Error',
         'Please select leave date for supplier ${index + 1}',
@@ -178,7 +162,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return false;
     }
 
-    if (supplier.actualLeaveDate!.isBefore(now)) {
+    if (supplier.actualDepartureDate!.isBefore(now)) {
       Get.snackbar(
         'Error',
         'Leave date cannot be in the past for supplier ${index + 1}',
@@ -188,8 +172,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return false;
     }
 
-    if (supplier.actualLeaveDate!.isBefore(supplier.actualArriveDate!) ||
-        supplier.actualLeaveDate!.isAtSameMomentAs(supplier.actualArriveDate!)) {
+    if (supplier.actualDepartureDate!.isBefore(supplier.actualArriveDate!) ||
+        supplier.actualDepartureDate!.isAtSameMomentAs(supplier.actualArriveDate!)) {
       Get.snackbar(
         'Error',
         'Leave date must be after arrival date for supplier ${index + 1}',
@@ -243,7 +227,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ? 'Are you sure you want to save?'
             : 'Are you sure you want to cancel?'),
         content: Text(isSave
-            ? 'This will save the current data with ${_suppliers.length} supplier(s) to the table.'
+            ? 'This will save the current data with ${_suppliers.length} supplier(s) to the temp_table.'
             : 'Any unsaved changes will be lost.'),
         actions: [
           TextButton(
@@ -271,15 +255,13 @@ class _AddEditDialogState extends State<AddEditDialog> {
     // Create a record for each supplier
     for (int i = 0; i < _suppliers.length; i++) {
       final supplier = _suppliers[i];
-      final record = SupplierData(
+      final record = TripData(
         id: widget.editData?.id ?? 0, // Will be set by AppState
-        supplierName: supplier.supplierName!,
         storageName: _storageName!,
         vehicleCode: _vehicleCode!,
         procurementSpecialist: _procurementSpecialist!,
         fleetSupervisor: _supervisorName!,
-        actualArriveDate: supplier.actualArriveDate!,
-        actualDepartureDate: supplier.actualLeaveDate!,
+        suppliers: _suppliers
       );
 
       if (widget.mode == DialogMode.add) {
@@ -425,7 +407,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
   }
 
   Widget _buildSupplierSection(int index) {
-    final supplier = _suppliers[index];
+    SupplierData supplier = _suppliers[index];
 
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -472,7 +454,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
             }).toList(),
             onChanged: (String? value) {
               setState(() {
-                supplier.supplierName = value;
+                //--------------------------------------------------------------------------------------
+                _suppliers[index].supplierName = value;
               });
             },
           ),
@@ -508,9 +491,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
                       suffixIcon: Icon(Icons.calendar_today),
                     ),
                     child: Text(
-                      supplier.actualLeaveDate != null
+                      supplier.actualDepartureDate != null
                           ? DateFormat('dd-MM-yyyy HH:mm')
-                          .format(supplier.actualLeaveDate!)
+                          .format(supplier.actualDepartureDate!)
                           : 'Select date and time',
                     ),
                   ),

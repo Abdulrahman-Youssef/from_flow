@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/models/trip_data.dart';
 import 'package:get/get.dart';
 import '../models/supplier_data.dart';
 import '../widgets/add_edit_dialog.dart' hide DialogMode;
 import '../widgets/temp_dialogs/try1.dart';
 
 class DashboardController extends GetxController {
-  var data = <SupplierData>[
+  var data = <TripData>[
     // SupplierData(
     //   id: 1,
     //   supplierName: "ABC Logistics Co.",
@@ -31,7 +32,7 @@ class DashboardController extends GetxController {
     );
   }
 
-  void showEditDialog(SupplierData record, BuildContext context) {
+  void showEditDialog(TripData record, BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AddEditDialog(
@@ -42,21 +43,25 @@ class DashboardController extends GetxController {
   }
 
   // when delete too fast teh dialog glitching and do not disappear
-  void showDeleteDialog(SupplierData record) {
+  void showDeleteDialog(TripData record) {
     Get.defaultDialog(
       title: 'Delete Record',
       middleText:
-          'This will permanently delete the record for ${record.supplierName} with Car ID ${record.vehicleCode}. This action cannot be undone.',
+          'This will permanently delete the record for suppliers ${record.suppliers.map((sup){
+            return " ${sup.supplierName} ";
+          })} with Car ID ${record.vehicleCode}. This action cannot be undone.',
       textCancel: 'Cancel',
       textConfirm: 'Delete',
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () {
-        deleteRecord(record.id);
+        deleteRecord(record.id!);
         Get.back();
         Get.snackbar(
           'Success',
-          'Record for ${record.supplierName} deleted successfully',
+          'Record for suppliers ${record.suppliers.map((sup){
+            return " ${sup.supplierName} ";
+          })} deleted successfully',
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
@@ -91,22 +96,22 @@ class DashboardController extends GetxController {
     final record = data.firstWhere((item) => item.id == id);
     final newId = data.isEmpty
         ? 1
-        : data.map((e) => e.id).reduce((a, b) => a > b ? a : b) + 1;
+        : data.map((e) => e.id).reduce((a, b) => a! > b! ? a : b)! + 1;
     final copiedRecord = record.copyWith(
       id: newId,
-      carId: record.vehicleCode,
+      vehicleCode: record.vehicleCode,
     );
     data.add(copiedRecord);
   }
 
-  void addRecord(SupplierData record) {
+  void addRecord(TripData record) {
     final newId = data.isEmpty
         ? 1
-        : data.map((e) => e.id).reduce((a, b) => a > b ? a : b) + 1;
+        : data.map((e) => e.id).reduce((a, b) => a! > b! ? a : b)! + 1;
     data.add(record.copyWith(id: newId));
   }
 
-  void updateRecord(SupplierData record) {
+  void updateRecord(TripData record) {
     final index = data.indexWhere((item) => item.id == record.id);
     if (index != -1) {
       data[index] = record;

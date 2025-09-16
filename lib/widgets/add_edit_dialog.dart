@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:form_flow/core/data/constant/data_lists.dart';
+import 'package:form_flow/models/trip_data.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../app_state.dart';
@@ -10,7 +11,7 @@ enum DialogMode { add, edit }
 
 class AddEditDialog1 extends StatefulWidget {
   final DialogMode mode;
-  final SupplierData? editData;
+  final TripData? editData;
 
   const AddEditDialog1({
     super.key,
@@ -30,6 +31,7 @@ class _AddEditDialogState extends State<AddEditDialog1> {
   String? _vehicleCode;
   final _carIdController = TextEditingController();
   String? _procurementSpecialist;
+  List<SupplierData>? _suppliers ;
   String? _supervisorName;
   DateTime? _actualArriveDate;
   DateTime? _actualLeaveDate;
@@ -56,13 +58,10 @@ class _AddEditDialogState extends State<AddEditDialog1> {
   void initState() {
     super.initState();
     if (widget.mode == DialogMode.edit && widget.editData != null) {
-      _supplierName = widget.editData!.supplierName;
       _storageName = widget.editData!.storageName;
       _vehicleCode = widget.editData!.vehicleCode;
       _procurementSpecialist = widget.editData!.procurementSpecialist;
-      _supervisorName = widget.editData!.fleetSupervisor;
-      _actualArriveDate = widget.editData!.actualArriveDate;
-      _actualLeaveDate = widget.editData!.actualDepartureDate;
+      _suppliers = widget.editData!.suppliers;
     }
   }
 
@@ -118,9 +117,7 @@ class _AddEditDialogState extends State<AddEditDialog1> {
     if (_supplierName == null ||
         _storageName == null ||
         _procurementSpecialist == null ||
-        _supervisorName == null ||
-        _actualArriveDate == null ||
-        _actualLeaveDate == null) {
+        _suppliers == null) {
       Get.snackbar(
         'Error',
         'Please fill in all fields',
@@ -177,7 +174,7 @@ class _AddEditDialogState extends State<AddEditDialog1> {
             ? 'Are you sure you want to save?'
             : 'Are you sure you want to cancel?'),
         content: Text(isSave
-            ? 'This will save the current data to the table.'
+            ? 'This will save the current data to the temp_table.'
             : 'Any unsaved changes will be lost.'),
         actions: [
           TextButton(
@@ -200,16 +197,16 @@ class _AddEditDialogState extends State<AddEditDialog1> {
   }
 
   void _performSave() {
-    final record = SupplierData(
+    final record = TripData(
       id: widget.editData?.id ?? 0,
       // Will be set by AppState
-      supplierName: _supplierName!,
+      // supplierName: _supplierName!,
       storageName: _storageName!,
       vehicleCode: _vehicleCode!,
       procurementSpecialist: _procurementSpecialist!,
-      fleetSupervisor: _supervisorName!,
-      actualArriveDate: _actualArriveDate!,
-      actualDepartureDate: _actualLeaveDate!,
+      fleetSupervisor: _supervisorName!, suppliers: [],
+      // actualArriveDate: _actualArriveDate!,
+      // actualDepartureDate: _actualLeaveDate!,
     );
 
     final controller = Get.find<DashboardController>();
