@@ -1,47 +1,35 @@
 class SupplierData {
-  final int id;
-  final String supplierName;
-  final String storageName;
-  final String carId;
-  final String procurementSpecialist;
-  final String supervisorName;
-  final DateTime actualArriveDate;
-  final DateTime actualLeaveDate;
-
+  final int? id;
+   String? supplierName;
+   DateTime? actualArriveDate;
+   DateTime? actualDepartureDate;
+   DateTime? planArriveDate;
   SupplierData({
-    required this.id,
-    required this.supplierName,
-    required this.storageName,
-    required this.carId,
-    required this.procurementSpecialist,
-    required this.supervisorName,
-    required this.actualArriveDate,
-    required this.actualLeaveDate,
+     this.id,
+     this.supplierName,
+     this.actualArriveDate,
+     this.actualDepartureDate,
   });
 
   SupplierData copyWith({
     int? id,
     String? supplierName,
-    String? storageName,
-    String? carId,
-    String? procurementSpecialist,
-    String? supervisorName,
     DateTime? actualArriveDate,
-    DateTime? actualLeaveDate,
+    DateTime? actualDepartureDate,
   }) {
     return SupplierData(
       id: id ?? this.id,
       supplierName: supplierName ?? this.supplierName,
-      storageName: storageName ?? this.storageName,
-      carId: carId ?? this.carId,
-      procurementSpecialist: procurementSpecialist ?? this.procurementSpecialist,
-      supervisorName: supervisorName ?? this.supervisorName,
       actualArriveDate: actualArriveDate ?? this.actualArriveDate,
-      actualLeaveDate: actualLeaveDate ?? this.actualLeaveDate,
+      actualDepartureDate: actualDepartureDate ?? this.actualDepartureDate,
     );
   }
 
-  int get waitingDays {
-    return actualLeaveDate.difference(actualArriveDate).inDays;
+  String get waitingTime {
+    final difference = actualDepartureDate!.difference(actualArriveDate!);
+    final hours = difference.inHours;
+    final minutes = difference.inMinutes.remainder(60);
+
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
   }
 }
