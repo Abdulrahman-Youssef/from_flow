@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/models/trip_data.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import '../models/supplier_data.dart';
 import 'package:file_picker/file_picker.dart';
 
-class DataTableWidget extends StatelessWidget {
-  final List<SupplierData> data;
+class DataTableWidget extends StatefulWidget {
+  final List<TripData> data;
   final DateTime selectedDate;
   final Function(DateTime) onDateChange;
   final VoidCallback onAddNew;
-  final Function(SupplierData, BuildContext) onEdit;
+  final Function(TripData, BuildContext) onEdit;
   final Function(int) onCopy;
-  final Function(SupplierData) onDelete;
+  final Function(TripData) onDelete;
   final VoidCallback onSave;
 
   const DataTableWidget({
@@ -27,35 +27,88 @@ class DataTableWidget extends StatelessWidget {
     required this.onSave,
   });
 
+  @override
+  _DataTableWidgetState createState() => _DataTableWidgetState();
+}
+
+class _DataTableWidgetState extends State<DataTableWidget> {
+  List<TripData> _trips = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _groupDataIntoTrips();
+  }
+
+  @override
+  void didUpdateWidget(DataTableWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      _groupDataIntoTrips();
+    }
+  }
+
+  void _groupDataIntoTrips() {
+    // Group by vehicle code and basic trip info
+    Map<String, List<TripData>> tripGroups = {};
+
+    for (var trip in widget.data) {
+      String tripKey =
+          '${trip.vehicleCode}-${trip.storageName}-${trip.procurementSpecialist}-${trip.fleetSupervisor}';
+
+      if (!tripGroups.containsKey(tripKey)) {
+        tripGroups[tripKey] = [];
+      }
+      tripGroups[tripKey]!.add(trip);
+    }
+
+    // Convert to TripData objects and sort suppliers within each trip
+    _trips = tripGroups.entries.map((entry) {
+      var tripsList = entry.value;
+      // Sort suppliers by arrival date within each trip
+      tripsList.sort((a, b) => a.suppliers.first.actualArriveDate!
+          .compareTo(b.suppliers.first.actualArriveDate!));
+
+      return TripData(
+        vehicleCode: tripsList.first.vehicleCode,
+        storageName: tripsList.first.storageName,
+        procurementSpecialist: tripsList.first.procurementSpecialist,
+        fleetSupervisor: tripsList.first.fleetSupervisor,
+        suppliers: tripsList.first.suppliers,
+        id: null,
+      );
+    }).toList();
+
+    // Sort trips by earliest arrival time
+    // _trips.sort((a, b) => a.earliestArrival!.compareTo(b.earliestArrival!));
+
+    setState(() {});
+  }
+
   String _formatDateTime(DateTime dateTime) {
     return DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
   }
 
   Future<void> _handleExport(BuildContext context) async {
     try {
-      // First prepare the CSV content in memory
       final String csvContent = _generateCsvContent();
 
-      // Show the save file dialog
       String? savePath = await FilePicker.platform.saveFile(
         dialogTitle: 'Save CSV Export',
         fileName:
-            'supply-chain-data-${DateFormat('yyyy-MM-dd').format(selectedDate)}.csv',
+        'supply-chain-trips-${DateFormat('yyyy-MM-dd').format(widget.selectedDate)}.csv',
         type: FileType.custom,
         allowedExtensions: ['csv'],
       );
 
-      // If user cancelled the dialog, do nothing
       if (savePath == null || savePath.isEmpty) {
         return;
       }
 
-      // Ensure the file has .csv extension
       if (!savePath.endsWith('.csv')) {
         savePath = '$savePath.csv';
       }
 
-      // Write the file to the selected path
       final file = File(savePath);
       await file.writeAsString(csvContent);
 
@@ -75,42 +128,206 @@ class DataTableWidget extends StatelessWidget {
     }
   }
 
-// Helper function to generate CSV content
   String _generateCsvContent() {
     final headers = [
-      'Row Number',
-      'Shipment Date',
-      'Supplier Name',
-      'Storage Name',
+      'Trip #',
       'Vehicle NO',
+      'Storage Name',
       'Procurement Specialist',
-      'fleet supervisor',
-      'Actual Arrive Date',
-      'Actual Departure Date',
-      'Waiting hours'
+      'Fleet Supervisor',
+      'Suppliers Count',
+      'Earliest Arrival',
+      'Latest Departure',
+      'Total Trip Time',
+      'Supplier Details'
     ];
 
     final csvContent = StringBuffer();
     csvContent.writeln(headers.join(','));
 
-    for (int i = 0; i < data.length; i++) {
-      final item = data[i];
+    for (int i = 0; i < _trips.length; i++) {
+      final trip = _trips[i];
+      final supplierDetails = trip.suppliers
+          .map((s) =>
+      '${s.supplierName} (${_formatDateTime(s.actualArriveDate!)} - ${_formatDateTime(s.actualDepartureDate!)})')
+          .join('; ');
+
       final row = [
         (i + 1).toString(),
-        DateFormat('dd/MM/yyyy').format(selectedDate),
-        '"${item.supplierName}"',
-        '"${item.storageName}"',
-        item.vehicleCode,
-        '"${item.procurementSpecialist}"',
-        '"${item.fleetSupervisor}"',
-        '"${_formatDateTime(item.actualArriveDate)}"',
-        '"${_formatDateTime(item.actualDepartureDate)}"',
-        item.waitingTime
+        trip.vehicleCode,
+        '"${trip.storageName}"',
+        '"${trip.procurementSpecialist}"',
+        '"${trip.fleetSupervisor}"',
+        trip.suppliers.length.toString(),
+        // '"${_formatDateTime(trip.earliestArrival!)}"',
+        // '"${_formatDateTime(trip.latestDeparture!)}"',
+        // trip.totalWaitingTime,
+        '"$supplierDetails"'
       ];
       csvContent.writeln(row.join(','));
     }
 
     return csvContent.toString();
+  }
+
+  void _toggleExpansion(int index) {
+    setState(() {
+      _trips[index].isExpanded = !_trips[index].isExpanded;
+    });
+  }
+
+  Widget _buildExpandedSupplierDetails(TripData trip) {
+    return Container(
+      margin: EdgeInsets.only(left: 40, right: 16, bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8),
+                topRight: Radius.circular(8),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex:2 , 
+                  child: Text(
+                    'Suppliers Details (${trip.suppliers.length} suppliers)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue.shade700,
+                    ),
+                  ),
+                ),
+                Expanded(child: Text("Actual Arrive Date",))
+              ],
+            ),
+          ),
+          ...trip.suppliers.asMap().entries.map((entry) {
+            final index = entry.key;
+            final supplier = entry.value;
+            return Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: index < trip.suppliers.length - 1
+                      ? BorderSide(color: Colors.grey.shade200)
+                      : BorderSide.none,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${index + 1}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      supplier.supplierName!,
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      _formatDateTime(supplier.actualArriveDate!),
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      _formatDateTime(supplier.actualDepartureDate!),
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        supplier.waitingTime,
+                        style: TextStyle(
+                          color: Colors.green.shade700,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, size: 14),
+                        onPressed: () => widget.onEdit(_trips.first, context),
+                        tooltip: 'Edit supplier',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.blue.shade50,
+                          foregroundColor: Colors.blue.shade600,
+                          minimumSize: Size(28, 28),
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      IconButton(
+                        icon: Icon(Icons.copy, size: 14),
+                        onPressed: () => widget.onCopy(supplier.id!),
+                        tooltip: 'Copy supplier',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.green.shade50,
+                          foregroundColor: Colors.green.shade600,
+                          minimumSize: Size(28, 28),
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      IconButton(
+                        icon: Icon(Icons.delete, size: 14),
+                        onPressed: () => widget.onDelete(trip),
+                        tooltip: 'Delete supplier',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.red.shade50,
+                          foregroundColor: Colors.red.shade600,
+                          minimumSize: Size(28, 28),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
   }
 
   @override
@@ -133,20 +350,41 @@ class DataTableWidget extends StatelessWidget {
                 // Title section
                 Expanded(
                   flex: 8,
-                  child: Text(
-                    'Supply Chain Management',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Supply Chain Management',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Container(
+                        padding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${_trips.length} Trip${_trips.length != 1 ? 's' : ''} • ${widget.data.length} Supplier${widget.data.length != 1 ? 's' : ''}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // Date picker section
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha:  0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -158,16 +396,16 @@ class DataTableWidget extends StatelessWidget {
                         onTap: () async {
                           final DateTime? picked = await showDatePicker(
                             context: context,
-                            initialDate: selectedDate,
+                            initialDate: widget.selectedDate,
                             firstDate: DateTime.now(),
                             lastDate: DateTime.now().add(Duration(days: 365)),
                           );
                           if (picked != null) {
-                            onDateChange(picked);
+                            widget.onDateChange(picked);
                           }
                         },
                         child: Text(
-                          DateFormat('dd/MM/yyyy').format(selectedDate),
+                          DateFormat('dd/MM/yyyy').format(widget.selectedDate),
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w500,
@@ -177,6 +415,7 @@ class DataTableWidget extends StatelessWidget {
                     ],
                   ),
                 ),
+
                 SizedBox(width: 16),
                 // Action buttons section
                 Expanded(
@@ -185,28 +424,28 @@ class DataTableWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: onAddNew,
+                        onPressed: widget.onAddNew,
                         icon: Icon(Icons.add, size: 16),
                         label: Text('Add New'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.1),
+                          backgroundColor: Colors.white.withValues(alpha:  0.1),
                           foregroundColor: Colors.white,
                           elevation: 0,
                           padding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                       ),
                       SizedBox(width: 8),
                       ElevatedButton.icon(
-                        onPressed: onSave,
+                        onPressed: widget.onSave,
                         icon: Icon(Icons.save, size: 16),
                         label: Text('Save All'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green.withOpacity(0.9),
+                          backgroundColor: Colors.green.withValues(alpha:  0.9),
                           foregroundColor: Colors.white,
                           elevation: 0,
                           padding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                       ),
                       SizedBox(width: 8),
@@ -215,11 +454,11 @@ class DataTableWidget extends StatelessWidget {
                         icon: Icon(Icons.file_download, size: 16),
                         label: Text('Export Excel'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue.withOpacity(0.9),
+                          backgroundColor: Colors.blue.withValues(alpha:  0.9),
                           foregroundColor: Colors.white,
                           elevation: 0,
                           padding:
-                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                       ),
                     ],
@@ -231,134 +470,223 @@ class DataTableWidget extends StatelessWidget {
           // Table content
           Expanded(
             child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SingleChildScrollView(
-                child: DataTable(
-                  headingRowColor: WidgetStateColor.resolveWith(
-                    (states) => Color(0xFFF9FAFB),
+              child: Column(
+                children: [
+                  // Table Header
+                  Container(
+                    color: Color(0xFFF9FAFB),
+                    child: Padding(
+                      padding: EdgeInsets.all(12),
+                      //headers
+                      child: Row(
+                        children: [
+                          SizedBox(width: 20), // Space for expand button
+                          Expanded(
+                              flex: 1,
+                              child: Text('Trip #',
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.w600))),
+                          Expanded(
+                              flex: 1,
+                              child: Text('Vehicle NO',
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.w600))),
+                          Expanded(
+                              flex: 2,
+                              child: Text('Storage Name',
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.w600))),
+                          Expanded(
+                              flex: 2,
+                              child: Center(
+                                child: Text('Suppliers',
+                                    style:
+                                    TextStyle(fontWeight: FontWeight.w600)),
+                              )),
+                          // SizedBox(width: ),
+                          Expanded(
+                              flex: 2,
+                              child: Text('Procurement Specialist',
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.w600))),
+                          Expanded(
+                              flex: 1,
+                              child: Text('Fleet Supervisor',
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.w600))),
+                          Expanded(
+                              flex: 2,
+                              child: Center(
+                                child: Text('Trip Duration',
+                                    style:
+                                    TextStyle(fontWeight: FontWeight.w600)),
+                              )),
+                          Expanded(
+                              flex: 1,
+                              child: Text('Actions',
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.w600))),
+                        ],
+                      ),
+                    ),
                   ),
-                  columns: [
-                    DataColumn(
-                        label: Text('#',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('Supplier Name',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('Storage Name',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('vehicle NO',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('Procurement Specialist',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('fleet Supervisor',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('Actual Arrive Date',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('Actual Departure Date',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('Waiting Hours',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                    DataColumn(
-                        label: Text('Actions',
-                            style: TextStyle(fontWeight: FontWeight.w600))),
-                  ],
-                  rows: data.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final item = entry.value;
-                    return DataRow(
-                      cells: [
-                        DataCell(
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text('${index + 1}'),
-                          ),
-                        ),
-                        DataCell(Text(item.supplierName)),
-                        DataCell(Text(item.storageName)),
-                        DataCell(
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade500,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(item.vehicleCode),
-                          ),
-                        ),
-                        DataCell(Text(item.procurementSpecialist)),
-                        DataCell(Text(item.fleetSupervisor)),
-                        DataCell(Text(_formatDateTime(item.actualArriveDate))),
-                        DataCell(Text(_formatDateTime(item.actualDepartureDate))),
-                        DataCell(
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${item.waitingTime} Hours:mints',
-                              style: TextStyle(color: Colors.blue.shade700),
+                  // Table Rows
+                  ...List.generate(_trips.length, (index) {
+                    final trip = _trips[index];
+                    return Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey.shade200),
                             ),
                           ),
-                        ),
-                        DataCell(
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.edit, size: 16),
-                                onPressed: () => onEdit(item, context),
-                                tooltip: 'Edit record',
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Colors.blue.shade50,
-                                  foregroundColor: Colors.blue.shade600,
-                                  minimumSize: Size(32, 32),
+                          child: Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                // Trip # and Expand/Collapse button
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    children: [
+                                      //expanded button
+                                      IconButton(
+                                        icon: Icon(
+                                          trip.isExpanded
+                                              ? Icons.keyboard_arrow_down
+                                              : Icons.keyboard_arrow_right,
+                                          size: 20,
+                                        ),
+                                        onPressed: () =>
+                                            _toggleExpansion(index),
+                                        style: IconButton.styleFrom(
+                                          backgroundColor: Colors.grey.shade100,
+                                          minimumSize: Size(32, 32),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Colors.grey.shade300),
+                                          borderRadius:
+                                          BorderRadius.circular(4),
+                                        ),
+                                        child:
+                                        Center(child: Text('${index + 1}')),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 4),
-                              IconButton(
-                                icon: Icon(Icons.copy, size: 16),
-                                onPressed: () => onCopy(item.id),
-                                tooltip: 'Copy record',
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Colors.green.shade50,
-                                  foregroundColor: Colors.green.shade600,
-                                  minimumSize: Size(32, 32),
+                                // Vehicle NO
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade500,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Center(
+                                          child: Text(trip.vehicleCode,
+                                              style: TextStyle(
+                                                  color: Colors.white))),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 4),
-                              IconButton(
-                                icon: Icon(Icons.delete, size: 16),
-                                onPressed: () => onDelete(item),
-                                tooltip: 'Delete record',
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Colors.red.shade50,
-                                  foregroundColor: Colors.red.shade600,
-                                  minimumSize: Size(32, 32),
+                                // Storage Name
+                                Expanded(
+                                    flex: 2, child: Text(trip.storageName)),
+                                // Suppliers
+                                Expanded(
+                                  flex: 2,
+                                  child: Row(
+                                    children: [
+                                      if (trip.suppliers.length == 1)
+                                        Expanded(
+                                            child: Text(
+                                                "${trip.suppliers.first.supplierName}")),
+                                      // Expanded(child: Text(trip.suppliersList)),
+                                      if (trip.suppliers.length > 1)
+                                        Expanded(
+                                          child: Center(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.blue.shade100,
+                                                borderRadius:
+                                                BorderRadius.circular(10),
+                                              ),
+                                              child: Text(
+                                                '${trip.suppliers.length} suppliers',
+                                                style: TextStyle(
+                                                  fontSize: 13.5,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.blue.shade700,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                                // Procurement Specialist
+                                Expanded(
+                                    flex: 2,
+                                    child: Text(trip.procurementSpecialist)),
+                                // Fleet Supervisor
+                                Expanded(
+                                    flex: 1, child: Text(trip.fleetSupervisor)),
+                                // Trip Duration
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                        horizontal: 10), // Add margin here
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.shade50,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '${trip.totalWaitingTime} Hours',
+                                        style: TextStyle(
+                                            color: Colors.blue.shade700),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Actions
+                                Expanded(
+                                  flex: 1,
+                                  child: Text(
+                                    'View Details',
+                                    style: TextStyle(
+                                      color: Colors.blue.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                        // Expanded supplier details
+                        if (trip.isExpanded)
+                          _buildExpandedSupplierDetails(trip),
                       ],
                     );
-                  }).toList(),
-                ),
+                  }),
+                ],
               ),
             ),
           ),

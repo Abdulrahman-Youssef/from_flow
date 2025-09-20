@@ -1,49 +1,32 @@
 class SupplierData {
-  final int id;
-  final String supplierName;
-  final String storageName;
-  final String vehicleCode;
-  final String procurementSpecialist;
-  final String fleetSupervisor;
-  final DateTime actualArriveDate;
-  final DateTime actualDepartureDate;
-
+  final int? id;
+   String? supplierName;
+   DateTime? actualArriveDate;
+   DateTime? actualDepartureDate;
+   DateTime? planArriveDate;
   SupplierData({
-    required this.id,
-    required this.supplierName,
-    required this.storageName,
-    required this.vehicleCode,
-    required this.procurementSpecialist,
-    required this.fleetSupervisor,
-    required this.actualArriveDate,
-    required this.actualDepartureDate,
+     this.id,
+     this.supplierName,
+     this.actualArriveDate,
+     this.actualDepartureDate,
   });
 
   SupplierData copyWith({
     int? id,
     String? supplierName,
-    String? storageName,
-    String? carId,
-    String? procurementSpecialist,
-    String? supervisorName,
     DateTime? actualArriveDate,
-    DateTime? actualLeaveDate,
+    DateTime? actualDepartureDate,
   }) {
     return SupplierData(
       id: id ?? this.id,
       supplierName: supplierName ?? this.supplierName,
-      storageName: storageName ?? this.storageName,
-      vehicleCode: carId ?? this.vehicleCode,
-      procurementSpecialist:
-          procurementSpecialist ?? this.procurementSpecialist,
-      fleetSupervisor: supervisorName ?? this.fleetSupervisor,
       actualArriveDate: actualArriveDate ?? this.actualArriveDate,
-      actualDepartureDate: actualLeaveDate ?? this.actualDepartureDate,
+      actualDepartureDate: actualDepartureDate ?? this.actualDepartureDate,
     );
   }
 
   String get waitingTime {
-    final difference = actualDepartureDate.difference(actualArriveDate);
+    final difference = actualDepartureDate!.difference(actualArriveDate!);
     final hours = difference.inHours;
     final minutes = difference.inMinutes.remainder(60);
 
