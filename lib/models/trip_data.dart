@@ -54,4 +54,6 @@ class TripData {
       return '${suppliers.first.supplierName} (+${suppliers.length - 1} more)';
     }
   }
+
+
 }
