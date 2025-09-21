@@ -1,19 +1,21 @@
+import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
 
 class TripData {
   final int? id;
 
   final String vehicleCode;
-  final String storageName;
   final String procurementSpecialist;
   final String fleetSupervisor;
   final List<SupplierData> suppliers;
+  final List<StorageData> storages;
+  // final String storageName;
   bool isExpanded;
 
   TripData({
      this.id,
     required this.vehicleCode,
-    required this.storageName,
+    required this.storages,
     required this.procurementSpecialist,
     required this.fleetSupervisor,
     required this.suppliers,
@@ -21,11 +23,11 @@ class TripData {
   });
 
   TripData copyWith(
-      {int? id, String? vehicleCode, String? storageName, String? procurementSpecialist, String? fleetSupervisor, List<
+      {int? id, String? vehicleCode,List<StorageData>? storageName, String? procurementSpecialist, String? fleetSupervisor, List<
           SupplierData>? suppliers }) {
     return TripData(id: id ?? this.id,
         vehicleCode: vehicleCode ?? this.vehicleCode,
-        storageName: storageName ?? this.storageName,
+        storages: storageName ?? this.storages,
         procurementSpecialist: procurementSpecialist ?? this.procurementSpecialist,
         fleetSupervisor: fleetSupervisor ?? this.fleetSupervisor,
         suppliers: suppliers ?? this.suppliers);

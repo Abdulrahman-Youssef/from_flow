@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/trip_data.dart';
 import 'package:form_flow/widgets/add_edit_dialog.dart';
 import 'package:get/get.dart';
@@ -7,9 +8,9 @@ import '../models/supplier_data.dart';
 class DashboardController extends GetxController {
   var data = <TripData>[
     TripData(
-      id: 1,
+        id: 1,
         vehicleCode: "0081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -19,9 +20,9 @@ class DashboardController extends GetxController {
               supplierName: "HIKMA PHARMA COMPANY")
         ]),
     TripData(
-      id: 2,
+        id: 2,
         vehicleCode: "2081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -33,7 +34,7 @@ class DashboardController extends GetxController {
     TripData(
         id: 3,
         vehicleCode: "3081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -45,7 +46,7 @@ class DashboardController extends GetxController {
     TripData(
         id: 4,
         vehicleCode: "4081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -57,7 +58,7 @@ class DashboardController extends GetxController {
     TripData(
         id: 5,
         vehicleCode: "5081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -69,7 +70,7 @@ class DashboardController extends GetxController {
     TripData(
         id: 6,
         vehicleCode: "6081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -81,7 +82,7 @@ class DashboardController extends GetxController {
     TripData(
         id: 7,
         vehicleCode: "7081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -93,7 +94,7 @@ class DashboardController extends GetxController {
     TripData(
         id: 8,
         vehicleCode: "8081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -103,9 +104,12 @@ class DashboardController extends GetxController {
               supplierName: "HIKMA PHARMA COMPANY")
         ]),
     TripData(
-      id: 9,
+        id: 9,
         vehicleCode: "9081",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [
+          StorageData(id: 1, name: "MAIN EXP. WAREHOUSE"),
+          StorageData(id: 2, name: "MAIN EXP222. WAREHOUSE")
+        ],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
@@ -121,7 +125,7 @@ class DashboardController extends GetxController {
     TripData(
         id: 10,
         vehicleCode: "90181",
-        storageName: "MAIN EXP. WAREHOUSE",
+        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [

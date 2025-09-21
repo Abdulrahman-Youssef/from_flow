@@ -1,14 +1,16 @@
 class SupplierData {
   final int? id;
-   String? supplierName;
-   DateTime? actualArriveDate;
-   DateTime? actualDepartureDate;
-   DateTime? planArriveDate;
+  String? supplierName;
+  DateTime? actualArriveDate;
+  DateTime? actualDepartureDate;
+  DateTime? planArriveDate;
+
   SupplierData({
-     this.id,
-     this.supplierName,
-     this.actualArriveDate,
-     this.actualDepartureDate,
+    this.id,
+    this.supplierName,
+    this.actualArriveDate,
+    this.actualDepartureDate,
+    this.planArriveDate,
   });
 
   SupplierData copyWith({
@@ -16,12 +18,14 @@ class SupplierData {
     String? supplierName,
     DateTime? actualArriveDate,
     DateTime? actualDepartureDate,
+    DateTime? planArriveDate,
   }) {
     return SupplierData(
       id: id ?? this.id,
       supplierName: supplierName ?? this.supplierName,
       actualArriveDate: actualArriveDate ?? this.actualArriveDate,
       actualDepartureDate: actualDepartureDate ?? this.actualDepartureDate,
+      planArriveDate : planArriveDate ?? this.planArriveDate,
     );
   }
 

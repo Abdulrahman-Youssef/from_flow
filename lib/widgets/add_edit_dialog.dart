@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:form_flow/core/data/constant/data_lists.dart';
+import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
 import 'package:form_flow/models/trip_data.dart';
 import 'package:get/get.dart';
@@ -26,12 +27,14 @@ class _AddEditDialogState extends State<AddEditDialog> {
   final _formKey = GlobalKey<FormState>();
 
   // Section 1: Vehicle Information
-  String? _storageName;
   String? _vehicleCode;
   String? _procurementSpecialist;
   String? _supervisorName;
 
-  // Section 2: Suppliers List
+  // Section 2: Storage Information
+  List<StorageData> _storages = [StorageData()];
+
+  // Section 3: Suppliers List
   List<SupplierData> _suppliers = [SupplierData()];
 
   final List<String> _supplierOptions = DataLists.suppliers;
@@ -52,26 +55,36 @@ class _AddEditDialogState extends State<AddEditDialog> {
   void initState() {
     super.initState();
     if (widget.mode == DialogMode.edit && widget.editData != null) {
-      _storageName = widget.editData!.storageName;
+      _storages = widget.editData!.storages;
       _vehicleCode = widget.editData!.vehicleCode;
       _procurementSpecialist = widget.editData!.procurementSpecialist;
       _supervisorName = widget.editData!.fleetSupervisor;
-
 
       // Initialize with existing supplier data
       _suppliers = widget.editData!.suppliers;
     }
   }
 
-  Future<void> _selectDateTime(BuildContext context, int supplierIndex, bool isArriveDate) async {
+  Future<void> _selectDateTime(BuildContext context, int supplierIndex, DateType dateType) async {
     final DateTime now = DateTime.now();
     final SupplierData supplier = _suppliers[supplierIndex];
 
+    DateTime? initialDate;
+    switch (dateType) {
+      case DateType.planArrive:
+        initialDate = supplier.planArriveDate ?? now;
+        break;
+      case DateType.actualArrive:
+        initialDate = supplier.actualArriveDate ?? now;
+        break;
+      case DateType.actualDeparture:
+        initialDate = supplier.actualDepartureDate ?? now;
+        break;
+    }
+
     final DateTime? date = await showDatePicker(
       context: context,
-      initialDate: isArriveDate
-          ? supplier.actualArriveDate ?? now
-          : supplier.actualDepartureDate ?? now,
+      initialDate: initialDate,
       firstDate: now,
       lastDate: now.add(Duration(days: 365)),
     );
@@ -79,11 +92,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
     if (date != null) {
       final TimeOfDay? time = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(
-          isArriveDate
-              ? supplier.actualArriveDate ?? now
-              : supplier.actualDepartureDate ?? now,
-        ),
+        initialTime: TimeOfDay.fromDateTime(initialDate),
       );
 
       if (time != null) {
@@ -96,17 +105,23 @@ class _AddEditDialogState extends State<AddEditDialog> {
         );
 
         setState(() {
-          if (isArriveDate) {
-            _suppliers[supplierIndex].actualArriveDate  =selectedDateTime ;
-          } else {
-            _suppliers[supplierIndex].actualDepartureDate =selectedDateTime;
+          switch (dateType) {
+            case DateType.planArrive:
+              _suppliers[supplierIndex] = _suppliers[supplierIndex].copyWith(planArriveDate: selectedDateTime);
+              break;
+            case DateType.actualArrive:
+              _suppliers[supplierIndex] = _suppliers[supplierIndex].copyWith(actualArriveDate: selectedDateTime);
+              break;
+            case DateType.actualDeparture:
+              _suppliers[supplierIndex] = _suppliers[supplierIndex].copyWith(actualDepartureDate: selectedDateTime);
+              break;
           }
         });
       }
     }
   }
 
-  void _addAnotherSupplier(){
+  void _addAnotherSupplier() {
     setState(() {
       _suppliers.add(SupplierData());
     });
@@ -116,6 +131,20 @@ class _AddEditDialogState extends State<AddEditDialog> {
     if (_suppliers.length > 1) {
       setState(() {
         _suppliers.removeAt(index);
+      });
+    }
+  }
+
+  void _addAnotherStorage() {
+    setState(() {
+      _storages.add(StorageData());
+    });
+  }
+
+  void _removeStorage(int index) {
+    if (_storages.length > 1) {
+      setState(() {
+        _storages.removeAt(index);
       });
     }
   }
@@ -131,10 +160,20 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return false;
     }
 
+    if (supplier.planArriveDate == null) {
+      Get.snackbar(
+        'Error',
+        'Please select plan arrival date for supplier ${index + 1}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return false;
+    }
+
     if (supplier.actualArriveDate == null) {
       Get.snackbar(
         'Error',
-        'Please select arrival date for supplier ${index + 1}',
+        'Please select actual arrival date for supplier ${index + 1}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -144,7 +183,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
     if (supplier.actualDepartureDate == null) {
       Get.snackbar(
         'Error',
-        'Please select leave date for supplier ${index + 1}',
+        'Please select departure date for supplier ${index + 1}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -152,10 +191,20 @@ class _AddEditDialogState extends State<AddEditDialog> {
     }
 
     final now = DateTime.now();
+    if (supplier.planArriveDate!.isBefore(now)) {
+      Get.snackbar(
+        'Error',
+        'Plan arrival date cannot be in the past for supplier ${index + 1}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return false;
+    }
+
     if (supplier.actualArriveDate!.isBefore(now)) {
       Get.snackbar(
         'Error',
-        'Arrival date cannot be in the past for supplier ${index + 1}',
+        'Actual arrival date cannot be in the past for supplier ${index + 1}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -165,7 +214,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
     if (supplier.actualDepartureDate!.isBefore(now)) {
       Get.snackbar(
         'Error',
-        'Leave date cannot be in the past for supplier ${index + 1}',
+        'Departure date cannot be in the past for supplier ${index + 1}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -176,7 +225,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
         supplier.actualDepartureDate!.isAtSameMomentAs(supplier.actualArriveDate!)) {
       Get.snackbar(
         'Error',
-        'Leave date must be after arrival date for supplier ${index + 1}',
+        'Departure date must be after actual arrival date for supplier ${index + 1}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -186,14 +235,26 @@ class _AddEditDialogState extends State<AddEditDialog> {
     return true;
   }
 
+  bool _validateStorage(StorageData storage, int index) {
+    if (storage.name == null || storage.name!.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please select storage name for storage ${index + 1}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return false;
+    }
+    return true;
+  }
+
   void _handleSave() {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     // Validate Section 1 (Vehicle Information)
-    if (_storageName == null ||
-        _vehicleCode == null ||
+    if (_vehicleCode == null ||
         _procurementSpecialist == null ||
         _supervisorName == null) {
       Get.snackbar(
@@ -205,7 +266,14 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return;
     }
 
-    // Validate Section 2 (Suppliers)
+    // Validate Section 2 (Storages)
+    for (int i = 0; i < _storages.length; i++) {
+      if (!_validateStorage(_storages[i], i)) {
+        return;
+      }
+    }
+
+    // Validate Section 3 (Suppliers)
     for (int i = 0; i < _suppliers.length; i++) {
       if (!_validateSupplier(_suppliers[i], i)) {
         return;
@@ -227,7 +295,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ? 'Are you sure you want to save?'
             : 'Are you sure you want to cancel?'),
         content: Text(isSave
-            ? 'This will save the current data with ${_suppliers.length} supplier(s) to the temp_table.'
+            ? 'This will save the current data with ${_storages.length} storage(s) and ${_suppliers.length} supplier(s) to the temp_table.'
             : 'Any unsaved changes will be lost.'),
         actions: [
           TextButton(
@@ -252,28 +320,24 @@ class _AddEditDialogState extends State<AddEditDialog> {
   void _performSave() {
     final controller = Get.find<DashboardController>();
 
-    // Create a record for each supplier
-    for (int i = 0; i < _suppliers.length; i++) {
-      final supplier = _suppliers[i];
-      final record = TripData(
-          id: widget.editData?.id ?? 0, // Will be set by AppState
-          storageName: _storageName!,
-          vehicleCode: _vehicleCode!,
-          procurementSpecialist: _procurementSpecialist!,
-          fleetSupervisor: _supervisorName!,
-          suppliers: _suppliers
-      );
+    final record = TripData(
+        id: widget.editData?.id ?? 0,
+        vehicleCode: _vehicleCode!,
+        procurementSpecialist: _procurementSpecialist!,
+        fleetSupervisor: _supervisorName!,
+        storages: _storages,
+        suppliers: _suppliers
+    );
 
-      if (widget.mode == DialogMode.add) {
-        controller.addRecord(record);
-      } else {
-        controller.updateRecord(record);
-      }
+    if (widget.mode == DialogMode.add) {
+      controller.addRecord(record);
+    } else {
+      controller.updateRecord(record);
     }
 
     Get.snackbar(
       'Success',
-      '${_suppliers.length} record(s) ${widget.mode == DialogMode.add ? 'added' : 'updated'} successfully',
+      'Record ${widget.mode == DialogMode.add ? 'added' : 'updated'} successfully with ${_storages.length} storage(s) and ${_suppliers.length} supplier(s)',
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );
@@ -302,7 +366,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: _vehicleCode,
+                  value: _vehicleCode,
                   decoration: InputDecoration(
                     labelText: 'Vehicle Number',
                     border: OutlineInputBorder(),
@@ -326,35 +390,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
               SizedBox(width: 16),
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: _storageName,
-                  decoration: InputDecoration(
-                    labelText: 'Storage Name',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _storageOptions.map((String storage) {
-                    return DropdownMenuItem<String>(
-                      value: storage,
-                      child: Text(storage),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _storageName = value;
-                    });
-                  },
-                  validator: (value) => value == null
-                      ? 'Please select a storage'
-                      : null,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: _supervisorName,
+                  value: _supervisorName,
                   decoration: InputDecoration(
                     labelText: 'Fleet Supervisor',
                     border: OutlineInputBorder(),
@@ -375,34 +411,119 @@ class _AddEditDialogState extends State<AddEditDialog> {
                       : null,
                 ),
               ),
-              SizedBox(width: 16),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: _procurementSpecialist,
-                  decoration: InputDecoration(
-                    labelText: 'Procurement Specialist',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _procurementSpecialists.map((String specialist) {
-                    return DropdownMenuItem<String>(
-                      value: specialist,
-                      child: Text(specialist),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _procurementSpecialist = value;
-                    });
-                  },
-                  validator: (value) => value == null
-                      ? 'Please select a specialist'
-                      : null,
-                ),
-              ),
             ],
+          ),
+          SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            value: _procurementSpecialist,
+            decoration: InputDecoration(
+              labelText: 'Procurement Specialist',
+              border: OutlineInputBorder(),
+            ),
+            items: _procurementSpecialists.map((String specialist) {
+              return DropdownMenuItem<String>(
+                value: specialist,
+                child: Text(specialist),
+              );
+            }).toList(),
+            onChanged: (String? value) {
+              setState(() {
+                _procurementSpecialist = value;
+              });
+            },
+            validator: (value) => value == null
+                ? 'Please select a specialist'
+                : null,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStorageSection(int index) {
+    StorageData storage = _storages[index];
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Storage ${index + 1}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.purple.shade700,
+                ),
+              ),
+              if (_storages.length > 1)
+                IconButton(
+                  onPressed: () => _removeStorage(index),
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  constraints: BoxConstraints(),
+                  padding: EdgeInsets.all(4),
+                ),
+            ],
+          ),
+          SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            initialValue: storage.name,
+            decoration: InputDecoration(
+              labelText: 'Storage Name',
+              border: OutlineInputBorder(),
+            ),
+            items: _storageOptions.map((String storageName) {
+              return DropdownMenuItem<String>(
+                value: storageName,
+                child: Text(storageName),
+              );
+            }).toList(),
+            onChanged: (String? value) {
+              setState(() {
+                _storages[index] = StorageData(name: value);
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStoragesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Storage Information',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.purple.shade700,
+          ),
+        ),
+        SizedBox(height: 16),
+        ...List.generate(_storages.length, (index) => _buildStorageSection(index)),
+        SizedBox(height: 8),
+        Center(
+          child: OutlinedButton.icon(
+            onPressed: _addAnotherStorage,
+            icon: Icon(Icons.add),
+            label: Text('Add Another Storage'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.purple,
+              side: BorderSide(color: Colors.purple),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -441,7 +562,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
           ),
           SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            initialValue: supplier.supplierName,
+            value: supplier.supplierName,
             decoration: InputDecoration(
               labelText: 'Supplier Name',
               border: OutlineInputBorder(),
@@ -454,17 +575,33 @@ class _AddEditDialogState extends State<AddEditDialog> {
             }).toList(),
             onChanged: (String? value) {
               setState(() {
-                //--------------------------------------------------------------------------------------
-                _suppliers[index].supplierName = value;
+                _suppliers[index] = _suppliers[index].copyWith(supplierName: value);
               });
             },
+          ),
+          SizedBox(height: 16),
+          InkWell(
+            onTap: () => _selectDateTime(context, index, DateType.planArrive),
+            child: InputDecorator(
+              decoration: InputDecoration(
+                labelText: 'Plan Arrive Date',
+                border: OutlineInputBorder(),
+                suffixIcon: Icon(Icons.calendar_today),
+              ),
+              child: Text(
+                supplier.planArriveDate != null
+                    ? DateFormat('dd-MM-yyyy HH:mm')
+                    .format(supplier.planArriveDate!)
+                    : 'Select date and time',
+              ),
+            ),
           ),
           SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: () => _selectDateTime(context, index, true),
+                  onTap: () => _selectDateTime(context, index, DateType.actualArrive),
                   child: InputDecorator(
                     decoration: InputDecoration(
                       labelText: 'Actual Arrive Date',
@@ -483,10 +620,10 @@ class _AddEditDialogState extends State<AddEditDialog> {
               SizedBox(width: 16),
               Expanded(
                 child: InkWell(
-                  onTap: () => _selectDateTime(context, index, false),
+                  onTap: () => _selectDateTime(context, index, DateType.actualDeparture),
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      labelText: 'Actual Leave Date',
+                      labelText: 'Actual Departure Date',
                       border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.calendar_today),
                     ),
@@ -557,7 +694,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
             SizedBox(height: 8),
             Text(
               widget.mode == DialogMode.add
-                  ? 'Fill in vehicle information and add one or more suppliers.'
+                  ? 'Fill in vehicle information, add storages, and add one or more suppliers.'
                   : 'Update the fields below to modify the existing record.',
               style: TextStyle(
                 color: Colors.grey.shade600,
@@ -574,7 +711,10 @@ class _AddEditDialogState extends State<AddEditDialog> {
                       // Section 1: Vehicle Information
                       _buildVehicleInformationSection(),
                       SizedBox(height: 24),
-                      // Section 2: Suppliers
+                      // Section 2: Storages
+                      _buildStoragesSection(),
+                      SizedBox(height: 24),
+                      // Section 3: Suppliers
                       _buildSuppliersSection(),
                     ],
                   ),
@@ -603,3 +743,5 @@ class _AddEditDialogState extends State<AddEditDialog> {
     );
   }
 }
+
+enum DateType { planArrive, actualArrive, actualDeparture }
