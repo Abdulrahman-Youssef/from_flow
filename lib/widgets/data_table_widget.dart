@@ -35,6 +35,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
   List<TripData> _trips = [];
   int? _totalSuppliers;
   int? _totalStorages;
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +50,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     if (oldWidget.data != widget.data) {
       _sortSuppliersByDateInTrip();
     }
+    _getTotalSuppliers();
+    _getStorages();
   }
 
   void _sortSuppliersByDateInTrip() {
@@ -58,24 +61,23 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     setState(() {});
   }
 
-  void _getTotalSuppliers(){
+  void _getTotalSuppliers() {
     int totalCount = 0;
 
-    if(_trips.isEmpty )
-      return;
+    if (_trips.isEmpty) return;
 
-    for(var trip in _trips){
+    for (var trip in _trips) {
       totalCount += trip.suppliers.length;
     }
     _totalSuppliers = totalCount;
   }
-  void _getStorages(){
+
+  void _getStorages() {
     int totalCount = 0;
 
-    if(_trips.isEmpty )
-      return;
+    if (_trips.isEmpty) return;
 
-    for(var trip in _trips){
+    for (var trip in _trips) {
       totalCount += trip.storages.length;
     }
     _totalStorages = totalCount;
@@ -172,7 +174,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     });
   }
 
-  Widget _buildExpandedSupplierDetails(TripData trip) {
+  Widget _buildExpandedDetails(TripData trip) {
     return Container(
       margin: EdgeInsets.only(left: 40, right: 16, bottom: 8),
       decoration: BoxDecoration(
@@ -325,6 +327,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                   ),
                 ),
                 SizedBox(width: 12),
+                if(false)
                 SizedBox(
                   width: 108,
                   child: Text(
@@ -430,6 +433,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                     ),
                   ),
                   SizedBox(width: 12),
+                  //actions
+                  if(false )
                   SizedBox(
                     width: 108,
                     child: Row(
@@ -769,276 +774,339 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Column(
         children: [
-          // Header
+          // Header (fixed)
           Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Color(0xFF1E3A8A),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Color(0xFF1E3A8A),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
               ),
-              child: _buildResponsiveHeader(context)),
-          // Table content
+            ),
+            child: _buildResponsiveHeader(context),
+          ),
+
+          // Table content with proper scrolling
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Table Header
-                  Container(
-                    color: Color(0xFFF9FAFB),
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      //headers
-                      child: Row(
-                        children: [
-                          SizedBox(width: 20), // Space for expand button
-                          Expanded(
-                              flex: 1,
-                              child: Text('Trip #',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600))),
-                          Expanded(
-                              flex: 1,
-                              child: Text('Vehicle NO',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600))),
-                          Expanded(
-                              flex: 2,
-                              child: Text('Storage Name',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600))),
-                          Expanded(
-                              flex: 2,
-                              child: Center(
-                                child: Text('Suppliers',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600)),
-                              )),
-                          // SizedBox(width: ),
-                          Expanded(
-                              flex: 2,
-                              child: Text('Procurement Specialist',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600))),
-                          Expanded(
-                              flex: 1,
-                              child: Text('Fleet Supervisor',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600))),
-                          Expanded(
-                              flex: 2,
-                              child: Center(
-                                child: Text('Trip Duration',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600)),
-                              )),
-                          Expanded(
-                              flex: 1,
-                              child: Text('Actions',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600))),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Table Rows
-                  ...List.generate(_trips.length, (index) {
-                    final trip = _trips[index];
-                    return Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(color: Colors.grey.shade200),
-                            ),
+              scrollDirection: Axis.vertical, // Primary vertical scroll
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal, // Secondary horizontal scroll
+                child: Container(
+                  width: MediaQuery.of(context).size.width > 1000
+                      ? MediaQuery.of(context).size.width - 32
+                      : 1000, // Fixed minimum width for horizontal scroll
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Table Header
+                      Container(
+                        color: Color(0xFFF9FAFB),
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 20), // Space for expand button
+                              Expanded(
+                                flex: 1,
+                                child: Text('Trip #',
+                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text('Vehicle NO',
+                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text('Storage Name',
+                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Center(
+                                  child: Text('Suppliers',
+                                      style: TextStyle(fontWeight: FontWeight.w600)),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text('Procurement Specialist',
+                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text('Fleet Supervisor',
+                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Center(
+                                  child: Text('Trip Duration',
+                                      style: TextStyle(fontWeight: FontWeight.w600)),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text('Actions',
+                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                              ),
+                            ],
                           ),
-                          child: Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                // Trip # and Expand/Collapse button
-                                Expanded(
-                                  flex: 1,
-                                  child: Row(
-                                    children: [
-                                      //expanded button
-                                      IconButton(
-                                        icon: Icon(
-                                          trip.isExpanded
-                                              ? Icons.keyboard_arrow_down
-                                              : Icons.keyboard_arrow_right,
-                                          size: 20,
-                                        ),
-                                        onPressed: () =>
-                                            _toggleExpansion(index),
-                                        style: IconButton.styleFrom(
-                                          backgroundColor: Colors.grey.shade100,
-                                          minimumSize: Size(32, 32),
-                                        ),
+                        ),
+                      ),
+
+                      // Table Rows
+                      ...List.generate(_trips.length, (index) {
+                        final trip = _trips[index];
+                        return Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(color: Colors.grey.shade200),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(12),
+                                child: Row(
+                                  children: [
+                                    // Trip # and Expand/Collapse button
+                                    Expanded(
+                                      flex: 1,
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(
+                                              trip.isExpanded
+                                                  ? Icons.keyboard_arrow_down
+                                                  : Icons.keyboard_arrow_right,
+                                              size: 20,
+                                            ),
+                                            onPressed: () => _toggleExpansion(index),
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: Colors.grey.shade100,
+                                              minimumSize: Size(32, 32),
+                                            ),
+                                          ),
+                                          SizedBox(width: 4),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.grey.shade300),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text('${index + 1}'),
+                                          ),
+                                        ],
                                       ),
-                                      Container(
+                                    ),
+                                    // Vehicle NO
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                        margin: EdgeInsets.symmetric(horizontal: 4),
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: Colors.grey.shade300),
-                                          borderRadius:
-                                              BorderRadius.circular(4),
+                                          color: Colors.grey.shade500,
+                                          borderRadius: BorderRadius.circular(4),
                                         ),
-                                        child:
-                                            Center(child: Text('${index + 1}')),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // Vehicle NO
-                                Expanded(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade500,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                          child: Text(trip.vehicleCode,
-                                              style: TextStyle(
-                                                  color: Colors.white))),
-                                    ),
-                                  ),
-                                ),
-                                // Storage
-                                Expanded(
-                                    flex: 2, child: Row(
-                                      children: [
-                                        if (trip.suppliers.length == 1)
-                                          Expanded(
-                                              child: Text(
-                                                  "${trip.storages.first.name}")),
-                                        // Expanded(child: Text(trip.suppliersList)),
-                                        if (trip.storages.length > 1)
-                                          Expanded(
-                                            child: Center(
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 6, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.purple.shade100,
-                                                  borderRadius:
-                                                  BorderRadius.circular(10),
-                                                ),
-                                                child: Text(
-                                                  '${trip.storages.length} Storages',
-                                                  style: TextStyle(
-                                                    fontSize: 13.5,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.purple.shade700,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),                                      ],
-                                    )),
-                                // Suppliers
-                                Expanded(
-                                  flex: 2,
-                                  child: Row(
-                                    children: [
-                                      if (trip.suppliers.length == 1)
-                                        Expanded(
-                                            child: Text(
-                                                "${trip.suppliers.first.supplierName}")),
-                                      // Expanded(child: Text(trip.suppliersList)),
-                                      if (trip.suppliers.length > 1)
-                                        Expanded(
-                                          child: Center(
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 6, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: Colors.blue.shade100,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: Text(
-                                                '${trip.suppliers.length} suppliers',
-                                                style: TextStyle(
-                                                  fontSize: 13.5,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.blue.shade700,
-                                                ),
-                                              ),
-                                            ),
+                                        child: Center(
+                                          child: Text(
+                                            trip.vehicleCode,
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
-                                    ],
-                                  ),
-                                ),
-                                // Procurement Specialist
-                                Expanded(
-                                    flex: 2,
-                                    child: Text(trip.procurementSpecialist)),
-                                // Fleet Supervisor
-                                Expanded(
-                                    flex: 1, child: Text(trip.fleetSupervisor)),
-                                // Trip Duration
-                                Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    margin: EdgeInsets.symmetric(
-                                        horizontal: 10), // Add margin here
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.shade50,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        '${trip.totalWaitingTime} Hours',
-                                        style: TextStyle(
-                                            color: Colors.blue.shade700),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                // Actions
-                                Expanded(
-                                  flex: 1,
-                                  child: Text(
-                                    'View Details',
-                                    style: TextStyle(
-                                      color: Colors.blue.shade600,
-                                      fontSize: 12,
+                                    // Storage
+                                    Expanded(
+                                      flex: 2,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: _buildStorageCell(trip),
+                                      ),
                                     ),
-                                  ),
+                                    // Suppliers
+                                    Expanded(
+                                      flex: 2,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: _buildSupplierCell(trip),
+                                      ),
+                                    ),
+                                    // Procurement Specialist
+                                    Expanded(
+                                      flex: 2,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: Text(
+                                          trip.procurementSpecialist,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    // Fleet Supervisor
+                                    Expanded(
+                                      flex: 1,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        child: Text(
+                                          trip.fleetSupervisor,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    // Trip Duration
+                                    Expanded(
+                                      flex: 2,
+                                      child: Container(
+                                        margin: EdgeInsets.symmetric(horizontal: 4),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue.shade50,
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '${trip.totalWaitingTime} Hours',
+                                            style: TextStyle(
+                                                color: Colors.blue.shade700),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    // Actions
+                                    Expanded(
+                                      flex: 1,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.edit, size: 16),
+                                            onPressed: () =>
+                                                widget.onEdit(trip, context),
+                                            tooltip: 'Edit record',
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: Colors.blue.shade50,
+                                              foregroundColor: Colors.blue.shade600,
+                                              minimumSize: Size(28, 28),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.copy, size: 16),
+                                            onPressed: () => widget.onCopy(trip.id!),
+                                            tooltip: 'Copy record',
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: Colors.green.shade50,
+                                              foregroundColor: Colors.green.shade600,
+                                              minimumSize: Size(28, 28),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.delete, size: 16),
+                                            onPressed: () => widget.onDelete(trip),
+                                            tooltip: 'Delete record',
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: Colors.red.shade50,
+                                              foregroundColor: Colors.red.shade600,
+                                              minimumSize: Size(28, 28),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ),
-                        // Expanded supplier details
-                        if (trip.isExpanded)
-                          _buildExpandedSupplierDetails(trip),
-                      ],
-                    );
-                  }),
-                ],
+                            // Expanded supplier details
+                            if (trip.isExpanded)
+                              Container(
+                                width: double.infinity,
+                                child: _buildExpandedDetails(trip),
+                              ),
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+// Helper widget for storage cell
+  Widget _buildStorageCell(TripData trip) {
+    if (trip.storages.length == 1) {
+      return Text(
+        trip.storages.first.name ?? 'Unknown',
+        overflow: TextOverflow.ellipsis,
+      );
+    } else {
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.purple.shade100,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          '${trip.storages.length} Storages',
+          style: TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
+            color: Colors.purple.shade700,
+          ),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
+    }
+  }
+
+// Helper widget for supplier cell
+  Widget _buildSupplierCell(TripData trip) {
+    if (trip.suppliers.length == 1) {
+      return Text(
+        trip.suppliers.first.supplierName ?? 'Unknown',
+        overflow: TextOverflow.ellipsis,
+      );
+    } else {
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.blue.shade100,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          '${trip.suppliers.length} suppliers',
+          style: TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
+            color: Colors.blue.shade700,
+          ),
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+        ),
+      );
+    }
   }
 }

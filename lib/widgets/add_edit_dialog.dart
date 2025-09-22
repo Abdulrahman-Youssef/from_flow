@@ -55,13 +55,14 @@ class _AddEditDialogState extends State<AddEditDialog> {
   void initState() {
     super.initState();
     if (widget.mode == DialogMode.edit && widget.editData != null) {
-      _storages = widget.editData!.storages;
       _vehicleCode = widget.editData!.vehicleCode;
       _procurementSpecialist = widget.editData!.procurementSpecialist;
       _supervisorName = widget.editData!.fleetSupervisor;
 
-      // Initialize with existing supplier data
+      // Initialize with existing suppliers data
       _suppliers = widget.editData!.suppliers;
+      // Initialize with existing storages data
+      _storages = widget.editData!.storages;
     }
   }
 

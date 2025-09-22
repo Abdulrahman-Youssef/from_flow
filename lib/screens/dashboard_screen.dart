@@ -46,7 +46,7 @@ class DashboardScreen extends StatelessWidget {
           child: GetX<DashboardController>(
             builder: (controller) {
               return DataTableWidget(
-                data: controller.data.toList(),
+                data: controller.trips.toList(),
                 selectedDate: controller.selectedDate.value,
                 onDateChange: controller.setSelectedDate,
                 onAddNew: () => controller.showAddDialog(context),
