@@ -149,11 +149,15 @@ class _DataTableWidgetState extends State<DataTableWidget> {
           .map((s) =>
               '${s.supplierName} (${_formatDateTime(s.actualArriveDate!)} - ${_formatDateTime(s.actualDepartureDate!)})')
           .join('; ');
+      final storageDetails = trip.storages
+          .map((s) =>
+      '${s.name}')
+          .join('; ');
 
       final row = [
         (i + 1).toString(),
         trip.vehicleCode,
-        '"trip.storageName"',
+        '"$storageDetails"',
         '"${trip.procurementSpecialist}"',
         '"${trip.fleetSupervisor}"',
         trip.suppliers.length.toString(),
