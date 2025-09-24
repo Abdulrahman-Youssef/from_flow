@@ -4,6 +4,7 @@ import 'package:form_flow/core/data/constant/data_lists.dart';
 import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
 import 'package:form_flow/models/trip_data.dart';
+import 'package:form_flow/screens/dashboard_widgets/dialog/dropdown_search/dropdown_search2.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -49,7 +50,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
     "Michael Johnson",
     "Sarah Brown"
   ];
-  final List<String> _fleetSupervisor = DataLists.fleetSupervisors;
+  final List<String> _fleetSupervisors = DataLists.fleetSupervisors;
 
   @override
   void initState() {
@@ -66,7 +67,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
     }
   }
 
-  Future<void> _selectDateTime(BuildContext context, int supplierIndex, DateType dateType) async {
+  Future<void> _selectDateTime(
+      BuildContext context, int supplierIndex, DateType dateType) async {
     final DateTime now = DateTime.now();
     final SupplierData supplier = _suppliers[supplierIndex];
 
@@ -108,13 +110,16 @@ class _AddEditDialogState extends State<AddEditDialog> {
         setState(() {
           switch (dateType) {
             case DateType.planArrive:
-              _suppliers[supplierIndex] = _suppliers[supplierIndex].copyWith(planArriveDate: selectedDateTime);
+              _suppliers[supplierIndex] = _suppliers[supplierIndex]
+                  .copyWith(planArriveDate: selectedDateTime);
               break;
             case DateType.actualArrive:
-              _suppliers[supplierIndex] = _suppliers[supplierIndex].copyWith(actualArriveDate: selectedDateTime);
+              _suppliers[supplierIndex] = _suppliers[supplierIndex]
+                  .copyWith(actualArriveDate: selectedDateTime);
               break;
             case DateType.actualDeparture:
-              _suppliers[supplierIndex] = _suppliers[supplierIndex].copyWith(actualDepartureDate: selectedDateTime);
+              _suppliers[supplierIndex] = _suppliers[supplierIndex]
+                  .copyWith(actualDepartureDate: selectedDateTime);
               break;
           }
         });
@@ -223,7 +228,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
     }
 
     if (supplier.actualDepartureDate!.isBefore(supplier.actualArriveDate!) ||
-        supplier.actualDepartureDate!.isAtSameMomentAs(supplier.actualArriveDate!)) {
+        supplier.actualDepartureDate!
+            .isAtSameMomentAs(supplier.actualArriveDate!)) {
       Get.snackbar(
         'Error',
         'Departure date must be after actual arrival date for supplier ${index + 1}',
@@ -327,8 +333,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
         procurementSpecialist: _procurementSpecialist!,
         fleetSupervisor: _supervisorName!,
         storages: _storages,
-        suppliers: _suppliers
-    );
+        suppliers: _suppliers);
 
     if (widget.mode == DialogMode.add) {
       controller.addRecord(record);
@@ -355,7 +360,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Vehicle Information',
+            'Trip Information',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -366,48 +371,38 @@ class _AddEditDialogState extends State<AddEditDialog> {
           Row(
             children: [
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: _vehicleCode,
-                  decoration: InputDecoration(
-                    labelText: 'Vehicle Number',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _vehicleNOOptions.map((String vehicleNO) {
-                    return DropdownMenuItem<String>(
-                      value: vehicleNO,
-                      child: Text(vehicleNO),
-                    );
-                  }).toList(),
+                child: ReusableSearchableDropdown(
+                  items: _vehicleNOOptions,
+                  selectedItem: _vehicleCode,
+                  labelText: "Vehicle Number",
+                  hintText: "Select vehicle...",
+                  searchHint: "Search vehicle...",
+                  prefixIcon: Icon(Icons.local_shipping),
                   onChanged: (String? value) {
                     setState(() {
                       _vehicleCode = value;
                     });
                   },
-                  validator: (value) => value == null
+                  validator: (value) => value == null || value.isEmpty
                       ? 'Please select a vehicle number'
                       : null,
                 ),
               ),
               SizedBox(width: 16),
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: _supervisorName,
-                  decoration: InputDecoration(
-                    labelText: 'Fleet Supervisor',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _fleetSupervisor.map((String supervisor) {
-                    return DropdownMenuItem<String>(
-                      value: supervisor,
-                      child: Text(supervisor),
-                    );
-                  }).toList(),
+                child: ReusableSearchableDropdown(
+                  items: _fleetSupervisors,
+                  selectedItem: _supervisorName,
+                  labelText: "Fleet Supervisor",
+                  hintText: "Select supervisor...",
+                  searchHint: "Search supervisor...",
+                  prefixIcon: Icon(Icons.supervised_user_circle),
                   onChanged: (String? value) {
                     setState(() {
                       _supervisorName = value;
                     });
                   },
-                  validator: (value) => value == null
+                  validator: (value) => value == null || value.isEmpty
                       ? 'Please select a supervisor'
                       : null,
                 ),
@@ -415,24 +410,19 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ],
           ),
           SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: _procurementSpecialist,
-            decoration: InputDecoration(
-              labelText: 'Procurement Specialist',
-              border: OutlineInputBorder(),
-            ),
-            items: _procurementSpecialists.map((String specialist) {
-              return DropdownMenuItem<String>(
-                value: specialist,
-                child: Text(specialist),
-              );
-            }).toList(),
+          ReusableSearchableDropdown(
+            items: _procurementSpecialists,
+            selectedItem: _procurementSpecialist,
+            labelText: "Procurement Specialist",
+            hintText: "Select specialist...",
+            searchHint: "Search specialist...",
+            prefixIcon: Icon(Icons.person),
             onChanged: (String? value) {
               setState(() {
                 _procurementSpecialist = value;
               });
             },
-            validator: (value) => value == null
+            validator: (value) => value == null || value.isEmpty
                 ? 'Please select a specialist'
                 : null,
           ),
@@ -475,23 +465,21 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ],
           ),
           SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            initialValue: storage.name,
-            decoration: InputDecoration(
-              labelText: 'Storage Name',
-              border: OutlineInputBorder(),
-            ),
-            items: _storageOptions.map((String storageName) {
-              return DropdownMenuItem<String>(
-                value: storageName,
-                child: Text(storageName),
-              );
-            }).toList(),
+          ReusableSearchableDropdown(
+            items: _storageOptions,
+            selectedItem: storage.name,
+            labelText: "Storage Name",
+            hintText: "Select storage...",
+            searchHint: "Search storage...",
+            prefixIcon: Icon(Icons.warehouse),
             onChanged: (String? value) {
               setState(() {
                 _storages[index] = StorageData(name: value);
               });
             },
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please select a storage'
+                : null,
           ),
         ],
       ),
@@ -511,7 +499,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
           ),
         ),
         SizedBox(height: 16),
-        ...List.generate(_storages.length, (index) => _buildStorageSection(index)),
+        ...List.generate(
+            _storages.length, (index) => _buildStorageSection(index)),
         SizedBox(height: 8),
         Center(
           child: OutlinedButton.icon(
@@ -562,23 +551,22 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ],
           ),
           SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: supplier.supplierName,
-            decoration: InputDecoration(
-              labelText: 'Supplier Name',
-              border: OutlineInputBorder(),
-            ),
-            items: _supplierOptions.map((String supplierName) {
-              return DropdownMenuItem<String>(
-                value: supplierName,
-                child: Text(supplierName),
-              );
-            }).toList(),
+          ReusableSearchableDropdown(
+            items: _supplierOptions,
+            selectedItem: supplier.supplierName,
+            labelText: "Supplier Name",
+            hintText: "Select supplier...",
+            searchHint: "Search supplier...",
+            prefixIcon: Icon(Icons.business),
             onChanged: (String? value) {
               setState(() {
-                _suppliers[index] = _suppliers[index].copyWith(supplierName: value);
+                _suppliers[index] =
+                    _suppliers[index].copyWith(supplierName: value);
               });
             },
+            validator: (value) => value == null || value.isEmpty
+                ? 'Please select a supplier'
+                : null,
           ),
           SizedBox(height: 16),
           InkWell(
@@ -602,7 +590,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: () => _selectDateTime(context, index, DateType.actualArrive),
+                  onTap: () =>
+                      _selectDateTime(context, index, DateType.actualArrive),
                   child: InputDecorator(
                     decoration: InputDecoration(
                       labelText: 'Actual Arrive Date',
@@ -621,7 +610,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
               SizedBox(width: 16),
               Expanded(
                 child: InkWell(
-                  onTap: () => _selectDateTime(context, index, DateType.actualDeparture),
+                  onTap: () =>
+                      _selectDateTime(context, index, DateType.actualDeparture),
                   child: InputDecorator(
                     decoration: InputDecoration(
                       labelText: 'Actual Departure Date',
@@ -657,7 +647,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
           ),
         ),
         SizedBox(height: 16),
-        ...List.generate(_suppliers.length, (index) => _buildSupplierSection(index)),
+        ...List.generate(
+            _suppliers.length, (index) => _buildSupplierSection(index)),
         SizedBox(height: 8),
         Center(
           child: OutlinedButton.icon(
