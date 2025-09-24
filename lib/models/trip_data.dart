@@ -1,9 +1,9 @@
 import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
+import 'package:intl/intl.dart';
 
 class TripData {
   final int? id;
-
   final String vehicleCode;
   final String procurementSpecialist;
   final String fleetSupervisor;
@@ -23,8 +23,8 @@ class TripData {
   });
 
   TripData copyWith(
-      {int? id, String? vehicleCode,List<StorageData>? storageName, String? procurementSpecialist, String? fleetSupervisor, List<
-          SupplierData>? suppliers }) {
+      {int? id, String? vehicleCode,String? name , String? procurementSpecialist, String? fleetSupervisor, List<
+          SupplierData>? suppliers ,List<StorageData>? storageName}) {
     return TripData(id: id ?? this.id,
         vehicleCode: vehicleCode ?? this.vehicleCode,
         storages: storageName ?? this.storages,
@@ -32,6 +32,7 @@ class TripData {
         fleetSupervisor: fleetSupervisor ?? this.fleetSupervisor,
         suppliers: suppliers ?? this.suppliers);
   }
+
 
 
   DateTime? get earliestArrival => suppliers

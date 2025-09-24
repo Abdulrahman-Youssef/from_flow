@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../models/supplier_data.dart';
 
 class DashboardController extends GetxController {
-  var data = <TripData>[
+  var trips = <TripData>[
     TripData(
         id: 1,
         vehicleCode: "0081",
@@ -206,35 +206,35 @@ class DashboardController extends GetxController {
   }
 
   void deleteRecord(int id) {
-    data.removeWhere((item) => item.id == id);
+    trips.removeWhere((item) => item.id == id);
   }
 
   void copyRecord(int id) {
-    final record = data.firstWhere((item) => item.id == id);
-    final newId = data.isEmpty
+    final record = trips.firstWhere((item) => item.id == id);
+    final newId = trips.isEmpty
         ? 1
-        : data.map((e) => e.id).reduce((a, b) => a! > b! ? a : b)! + 1;
+        : trips.map((e) => e.id).reduce((a, b) => a! > b! ? a : b)! + 1;
     final copiedRecord = record.copyWith(
       id: newId,
       vehicleCode: record.vehicleCode,
     );
-    data.add(copiedRecord);
+    trips.add(copiedRecord);
   }
 
   void addRecord(TripData record) {
-    final newId = data.isEmpty
+    final newId = trips.isEmpty
         ? 1
-        : data.map((tripData) => tripData.id).reduce(
+        : trips.map((tripData) => tripData.id).reduce(
                 (maximumValue, nextValue) =>
                     maximumValue! > nextValue! ? maximumValue : nextValue)! +
             1;
-    data.add(record.copyWith(id: newId));
+    trips.add(record.copyWith(id: newId));
   }
 
   void updateRecord(TripData record) {
-    final index = data.indexWhere((item) => item.id == record.id);
+    final index = trips.indexWhere((item) => item.id == record.id);
     if (index != -1) {
-      data[index] = record;
+      trips[index] = record;
     }
   }
 }
