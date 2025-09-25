@@ -26,11 +26,13 @@ class AddEditDialog extends StatefulWidget {
 
 class _AddEditDialogState extends State<AddEditDialog> {
   final _formKey = GlobalKey<FormState>();
+  late TextEditingController noteController ;
 
-  // Section 1: Vehicle Information
+  // Section 1: Trip Information
   String? _vehicleCode;
   String? _procurementSpecialist;
   String? _supervisorName;
+  String? _note;
 
   // Section 2: Storage Information
   List<StorageData> _storages = [StorageData()];
@@ -59,11 +61,15 @@ class _AddEditDialogState extends State<AddEditDialog> {
       _vehicleCode = widget.editData!.vehicleCode;
       _procurementSpecialist = widget.editData!.procurementSpecialist;
       _supervisorName = widget.editData!.fleetSupervisor;
+      _supervisorName = widget.editData!.fleetSupervisor;
+      noteController = TextEditingController(text: widget.editData!.note);
 
       // Initialize with existing suppliers data
       _suppliers = widget.editData!.suppliers;
       // Initialize with existing storages data
       _storages = widget.editData!.storages;
+    }else {
+       noteController = TextEditingController();
     }
   }
 
@@ -333,7 +339,8 @@ class _AddEditDialogState extends State<AddEditDialog> {
         procurementSpecialist: _procurementSpecialist!,
         fleetSupervisor: _supervisorName!,
         storages: _storages,
-        suppliers: _suppliers);
+        suppliers: _suppliers,
+        note: _note);
 
     if (widget.mode == DialogMode.add) {
       controller.addRecord(record);
@@ -349,7 +356,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
     );
   }
 
-  Widget _buildVehicleInformationSection() {
+  Widget _buildTripInformationSection() {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -425,6 +432,24 @@ class _AddEditDialogState extends State<AddEditDialog> {
             validator: (value) => value == null || value.isEmpty
                 ? 'Please select a specialist'
                 : null,
+          ),
+          SizedBox(height: 16),
+          // Note
+          TextField(
+            controller: noteController,
+            decoration: InputDecoration(
+              labelText: 'Note',
+              hintText: 'Write your note here...',
+              border: OutlineInputBorder(),
+              alignLabelWithHint: true,
+            ),
+            onTapOutside: (tap){
+              _note = noteController.text.toString();
+              print("tabped out side $_note");
+            },
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
           ),
         ],
       ),
@@ -580,7 +605,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
               child: Text(
                 supplier.planArriveDate != null
                     ? DateFormat('dd-MM-yyyy HH:mm')
-                    .format(supplier.planArriveDate!)
+                        .format(supplier.planArriveDate!)
                     : 'Select date and time',
               ),
             ),
@@ -601,7 +626,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
                     child: Text(
                       supplier.actualArriveDate != null
                           ? DateFormat('dd-MM-yyyy HH:mm')
-                          .format(supplier.actualArriveDate!)
+                              .format(supplier.actualArriveDate!)
                           : 'Select date and time',
                     ),
                   ),
@@ -621,7 +646,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
                     child: Text(
                       supplier.actualDepartureDate != null
                           ? DateFormat('dd-MM-yyyy HH:mm')
-                          .format(supplier.actualDepartureDate!)
+                              .format(supplier.actualDepartureDate!)
                           : 'Select date and time',
                     ),
                   ),
@@ -701,7 +726,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
                   child: Column(
                     children: [
                       // Section 1: Vehicle Information
-                      _buildVehicleInformationSection(),
+                      _buildTripInformationSection(),
                       SizedBox(height: 24),
                       // Section 2: Storages
                       _buildStoragesSection(),

@@ -1,9 +1,9 @@
 import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
-import 'package:intl/intl.dart';
 
 class TripData {
   final int? id;
+  final String? note;
   final String vehicleCode;
   final String procurementSpecialist;
   final String fleetSupervisor;
@@ -14,6 +14,7 @@ class TripData {
 
   TripData({
      this.id,
+     this.note,
     required this.vehicleCode,
     required this.storages,
     required this.procurementSpecialist,
