@@ -1,80 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/models/trip_data.dart';
+import 'package:form_flow/controller/home_controller.dart';
+import 'package:form_flow/models/shipment_model.dart';
+import 'package:form_flow/widgets/home_widgets/home_header_section.dart';
+import 'package:form_flow/widgets/home_widgets/home_search_section.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class SupplyDeliveryData {
-  final String id;
-  final String name;
-  final DateTime date;
-  final List<TripData> trips;
-
-  SupplyDeliveryData({
-    required this.id,
-    required this.name,
-    required this.date,
-    required this.trips,
-  });
-
-  int get tripsCount => trips.length;
-
-  int get suppliersCount => trips
-      .expand((trip) => trip.suppliers)
-      .length;
-
-  int get vehiclesCount => trips
-      .map((trip) => trip.vehicleCode)
-      .toSet()
-      .length;
-
-// int get storagesCount => trips
-//     .expand((trip) => trip.name)
-//     .map((storage) => storage.storageName)
-//     .toSet()
-//     .length;
-}
-
-class HomeScreen extends StatefulWidget {
-  final List<SupplyDeliveryData> deliveries;
+class HomeScreen extends GetView<HomeController> {
+  // will be moved to controller until that happened it will stay here
   final Function(SupplyDeliveryData) onDeliveryTap;
   final VoidCallback onAddNewDelivery;
 
   const HomeScreen({
     super.key,
-    required this.deliveries,
     required this.onDeliveryTap,
     required this.onAddNewDelivery,
   });
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  String _searchQuery = '';
-  String _sortBy = 'date'; // 'date', 'name', 'trips'
-
-  List<SupplyDeliveryData> get _filteredDeliveries {
-    var filtered = widget.deliveries.where((delivery) {
-      final matchesSearch = delivery.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          DateFormat('dd/MM/yyyy').format(delivery.date).contains(_searchQuery);
-      return matchesSearch;
-    }).toList();
-
-    // Sort deliveries
-    filtered.sort((a, b) {
-      switch (_sortBy) {
-        case 'name':
-          return a.name.compareTo(b.name);
-        case 'trips':
-          return b.tripsCount.compareTo(a.tripsCount);
-        case 'date':
-        default:
-          return b.date.compareTo(a.date); // Most recent first
-      }
-    });
-
-    return filtered;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,185 +24,48 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           // Header Section
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Color(0xFF1E3A8A),
-                  Color(0xFF3B82F6),
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title and Add Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Supply Chain Management',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'إدارة سلسلة التوريد',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white.withValues(alpha: 0.8),
-                              ),
-                            ),
-                          ],
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: widget.onAddNewDelivery,
-                          icon: Icon(Icons.add, size: 20),
-                          label: Text('New Delivery'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Color(0xFF1E3A8A),
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: 24),
-
-                    // Stats Row
-                    Row(
-                      children: [
-                        _buildStatCard(
-                          'Total Deliveries',
-                          'إجمالي التوريدات',
-                          widget.deliveries.length.toString(),
-                          Icons.local_shipping,
-                          Colors.white.withValues(alpha: 0.2),
-                        ),
-                        SizedBox(width: 16),
-                        _buildStatCard(
-                          'Active Trips',
-                          'الرحلات النشطة',
-                          widget.deliveries.fold<int>(0, (sum, d) => sum + d.tripsCount).toString(),
-                          Icons.route,
-                          Colors.white.withValues(alpha: 0.2),
-                        ),
-                        SizedBox(width: 16),
-                        _buildStatCard(
-                          'Total Suppliers',
-                          'إجمالي الموردين',
-                          widget.deliveries.fold<int>(0, (sum, d) => sum + d.suppliersCount).toString(),
-                          Icons.business,
-                          Colors.white.withValues(alpha: 0.2),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          homeHeaderSection(
+            onAddNewDelivery: () {},
+            totalDeliveries: controller.deliveries.length,
           ),
 
           // Search and Filter Section
-          Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: TextField(
-                    onChanged: (value) => setState(() => _searchQuery = value),
-                    decoration: InputDecoration(
-                      hintText: 'Search deliveries...',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _sortBy,
-                    decoration: InputDecoration(
-                      labelText: 'Sort by',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
-                    ),
-                    items: [
-                      DropdownMenuItem(value: 'date', child: Text('Date')),
-                      DropdownMenuItem(value: 'name', child: Text('Name')),
-                      DropdownMenuItem(value: 'trips', child: Text('Trips Count')),
-                    ],
-                    onChanged: (value) => setState(() => _sortBy = value!),
-                  ),
-                ),
-              ],
-            ),
+          SearchAndSortBar(
+            onSearchChanged: controller.updateSearchQuery,
+            onSortChanged: controller.updateSortBy,
+            currentSortBy: controller.sortBy.value,
           ),
-
           // Deliveries Grid
           Expanded(
-            child: _filteredDeliveries.isEmpty
+            child: Obx(() => controller.filteredDeliveries.isEmpty
                 ? _buildEmptyState()
-                : Padding(
-              padding: EdgeInsets.all(16),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final crossAxisCount = _getCrossAxisCount(constraints.maxWidth);
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      childAspectRatio: 1.2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
-                    itemCount: _filteredDeliveries.length,
-                    itemBuilder: (context, index) {
-                      final delivery = _filteredDeliveries[index];
-                      return _buildDeliveryCard(delivery);
+                : LayoutBuilder(
+                    builder: (context, constraints) {
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.all(16),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 2.1,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                        itemCount: controller.filteredDeliveries.length,
+                        itemBuilder: (context, index) {
+                          final delivery = controller.filteredDeliveries[index];
+                          return _buildDeliveryCard(delivery);
+                        },
+                      );
                     },
-                  );
-                },
-              ),
-            ),
+                  )),
           ),
         ],
       ),
     );
   }
 
-  int _getCrossAxisCount(double width) {
-    if (width > 1200) return 4;
-    if (width > 800) return 3;
-    if (width > 600) return 2;
-    return 1;
-  }
-
-  Widget _buildStatCard(String title, String titleArabic, String value, IconData icon, Color backgroundColor) {
+  Widget _buildStatCard(String title, String titleArabic, String value,
+      IconData icon, Color backgroundColor) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.all(16),
@@ -313,12 +117,13 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        onTap: () => widget.onDeliveryTap(delivery),
+        onTap: () => onDeliveryTap(delivery),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Header with name and date
               Row(
@@ -327,14 +132,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       delivery.name,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF1E3A8A),
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  SizedBox(width: 8),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
@@ -344,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       DateFormat('dd/MM').format(delivery.date),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1E3A8A),
                       ),
@@ -353,47 +159,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
 
-              SizedBox(height: 12),
+              SizedBox(height: 8),
 
               Text(
                 DateFormat('EEEE, dd MMMM yyyy').format(delivery.date),
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   color: Colors.grey.shade600,
                 ),
               ),
-
-              SizedBox(height: 16),
-
+              SizedBox(height: 12),
               // Stats Grid
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildMiniStat(
-                        delivery.tripsCount.toString(),
-                        'Trips',
-                        'رحلات',
-                        Icons.route,
-                        Colors.blue,
-                      ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildMiniStat(
+                      delivery.tripsCount.toString(),
+                      'Trips',
+                      'رحلات',
+                      Icons.route,
+                      Colors.blue,
                     ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: _buildMiniStat(
-                        delivery.suppliersCount.toString(),
-                        'Suppliers',
-                        'موردين',
-                        Icons.business,
-                        Colors.green,
-                      ),
+                  ),
+                  SizedBox(width: 6),
+                  Expanded(
+                    child: _buildMiniStat(
+                      delivery.suppliersCount.toString(),
+                      'Suppliers',
+                      'موردين',
+                      Icons.business,
+                      Colors.green,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-
-              SizedBox(height: 8),
-
+              SizedBox(height: 6),
               Row(
                 children: [
                   Expanded(
@@ -405,16 +205,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Colors.orange,
                     ),
                   ),
-                  SizedBox(width: 8),
-                  // Expanded(
-                  //   child: _buildMiniStat(
-                  //     delivery.storagesCount.toString(),
-                  //     'Storages',
-                  //     'مخازن',
-                  //     Icons.warehouse,
-                  //     Colors.purple,
-                  //   ),
-                  // ),
+                  SizedBox(width: 6),
+                  Expanded(child: SizedBox()),
                 ],
               ),
             ],
@@ -424,9 +216,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMiniStat(String value, String label, String labelArabic, IconData icon, Color color) {
+  Widget _buildMiniStat(String value, String label, String labelArabic,
+      IconData icon, Color color) {
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
@@ -434,12 +227,12 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 16),
-          SizedBox(height: 4),
+          Icon(icon, color: color, size: 14),
+          SizedBox(height: 2),
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -450,6 +243,8 @@ class _HomeScreenState extends State<HomeScreen> {
               fontSize: 8,
               color: Colors.grey.shade600,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           Text(
             labelArabic,
@@ -457,6 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
               fontSize: 7,
               color: Colors.grey.shade500,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -492,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: widget.onAddNewDelivery,
+            onPressed: onAddNewDelivery,
             icon: Icon(Icons.add),
             label: Text('Create New Delivery'),
             style: ElevatedButton.styleFrom(

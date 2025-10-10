@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/controller/home_controller.dart';
 import 'package:get/get.dart';
 import '../app_state.dart';
 
@@ -22,7 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       if (_usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+        Get.lazyPut<HomeController>(() => HomeController());
         Get.find<AppController>().login();
+
       }
     }
   }
