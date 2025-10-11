@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/models/trip_data.dart';
+import 'package:form_flow/screens/dashboard_widgets/dashboard_build_expanded_details.dart';
+import 'package:form_flow/screens/dashboard_widgets/dashboard_build_responsive_header.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
@@ -149,10 +151,7 @@ class _DataTableWidgetState extends State<DataTableWidget> {
           .map((s) =>
               '${s.supplierName} (${_formatDateTime(s.actualArriveDate!)} - ${_formatDateTime(s.actualDepartureDate!)})')
           .join('; ');
-      final storageDetails = trip.storages
-          .map((s) =>
-      '${s.name}')
-          .join('; ');
+      final storageDetails = trip.storages.map((s) => '${s.name}').join('; ');
 
       final row = [
         (i + 1).toString(),
@@ -178,605 +177,6 @@ class _DataTableWidgetState extends State<DataTableWidget> {
     });
   }
 
-  Widget _buildExpandedDetails(TripData trip) {
-    return Container(
-      margin: EdgeInsets.only(left: 40, right: 16, bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        children: [
-          // Storage Section
-          Container(
-            margin: EdgeInsetsGeometry.directional(bottom: 10),
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.purple.shade50,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                topRight: Radius.circular(8),
-              ),
-              border: Border(
-                bottom: BorderSide(color: Colors.grey.shade300),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Storages (${trip.storages.length} storage${trip.storages.length != 1 ? 's' : ''})',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.purple.shade700,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: trip.storages.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final storage = entry.value;
-                    return Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.purple.shade100,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.purple.shade200),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: Colors.purple.shade300,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '${index + 1}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            storage.name ?? 'Unknown Storage',
-                            style: TextStyle(
-                              color: Colors.purple.shade700,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-
-          // Suppliers Section Header
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-            ),
-            child: Row(
-              children: [
-                Container(width: 24),
-                SizedBox(width: 12),
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    'Suppliers Details (${trip.suppliers.length} supplier${trip.suppliers.length != 1 ? 's' : ''})',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    "Plan Arrive Date",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    "Actual Arrive Date",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    "Actual Departure Date",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    "Waiting Time",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade700,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12),
-                if(false)
-                SizedBox(
-                  width: 108,
-                  child: Text(
-                    "Actions",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue.shade700,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(width: 8),
-              ],
-            ),
-          ),
-
-          // Suppliers Rows
-          ...trip.suppliers.asMap().entries.map((entry) {
-            final index = entry.key;
-            final supplier = entry.value;
-            return Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: index < trip.suppliers.length - 1
-                      ? BorderSide(color: Colors.grey.shade300)
-                      : BorderSide.none,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${index + 1}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blue.shade700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                      supplier.supplierName ?? 'Unknown Supplier',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      supplier.planArriveDate != null
-                          ? _formatDateTime(supplier.planArriveDate!)
-                          : 'Not set',
-                      style: TextStyle(fontSize: 13),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      supplier.actualArriveDate != null
-                          ? _formatDateTime(supplier.actualArriveDate!)
-                          : 'Not set',
-                      style: TextStyle(fontSize: 13),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      supplier.actualDepartureDate != null
-                          ? _formatDateTime(supplier.actualDepartureDate!)
-                          : 'Not set',
-                      style: TextStyle(fontSize: 13),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.green.shade200),
-                      ),
-                      child: Text(
-                        supplier.waitingTime ?? '00:00',
-                        style: TextStyle(
-                          color: Colors.green.shade700,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  //actions
-                  if(false )
-                  SizedBox(
-                    width: 108,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.edit, size: 14),
-                          onPressed: () => widget.onEdit(trip, context),
-                          tooltip: 'Edit trip',
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.blue.shade50,
-                            foregroundColor: Colors.blue.shade600,
-                            minimumSize: Size(28, 28),
-                            padding: EdgeInsets.zero,
-                          ),
-                        ),
-                        SizedBox(width: 4),
-                        IconButton(
-                          icon: Icon(Icons.delete, size: 14),
-                          onPressed: () => widget.onDelete(trip),
-                          tooltip: 'Delete trip',
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.red.shade50,
-                            foregroundColor: Colors.red.shade600,
-                            minimumSize: Size(28, 28),
-                            padding: EdgeInsets.zero,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                ],
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildResponsiveHeader(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isCompact = screenWidth < 1200; // Breakpoint for compact layout
-    final isVeryCompact =
-        screenWidth < 800; // Breakpoint for very compact layout
-
-    if (isVeryCompact) {
-      // Stack layout for very small screens
-      return Column(
-        children: [
-          // First row: Title and stats
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Stats container
-                Flexible(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${_trips.length} Trip${_trips.length != 1 ? 's' : ''} • $_totalSuppliers Supplier${_totalSuppliers != 1 ? 's' : ''} •  $_totalStorages Supplier${_totalStorages != 1 ? 's' : ''}• ${_trips.length} vehicle${_trips.length != 1 ? 's' : ''} ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                Spacer(),
-                // Date picker
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: GestureDetector(
-                    onTap: () async {
-                      final DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: widget.selectedDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
-                      );
-                      if (picked != null) {
-                        widget.onDateChange(picked);
-                      }
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.calendar_today,
-                            color: Colors.white, size: 14),
-                        SizedBox(width: 4),
-                        Text(
-                          DateFormat('dd/MM/yyyy').format(widget.selectedDate),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Second row: Action buttons
-          Padding(
-            padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: widget.onAddNew,
-                    icon: Icon(Icons.add, size: 14),
-                    label: Text('Add', style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.1),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 6),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: widget.onSave,
-                    icon: Icon(Icons.save, size: 14),
-                    label: Text('Save', style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.withValues(alpha: 0.9),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 6),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _handleExport(context),
-                    icon: Icon(Icons.file_download, size: 14),
-                    label: Text('Export', style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.withValues(alpha: 0.9),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
-    // Single row layout for larger screens
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Row(
-        children: [
-          // Stats section - adapts based on screen size
-          if (!isCompact) ...[
-            // Full stats for large screens
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '${_trips.length} Trip${_trips.length != 1 ? 's' : ''} • $_totalSuppliers Supplier${_totalSuppliers != 1 ? 's' : ''} •  $_totalStorages Storage${_totalStorages != 1 ? 's' : ''}• ${_trips.length} vehicle${_trips.length != 1 ? 's' : ''} ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ] else ...[
-            // Compact stats for medium screens
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '${_trips.length}T • ${widget.data.length}S',
-                // T=Trips, S=Suppliers
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-
-          // Flexible spacer
-          Expanded(child: SizedBox(width: 16)),
-
-          // Date picker - always visible but adapts size
-          Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: isCompact ? 8 : 12, vertical: isCompact ? 6 : 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: GestureDetector(
-              onTap: () async {
-                final DateTime? picked = await showDatePicker(
-                  context: context,
-                  initialDate: widget.selectedDate,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(Duration(days: 365)),
-                );
-                if (picked != null) {
-                  widget.onDateChange(picked);
-                }
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.calendar_today,
-                      color: Colors.white, size: isCompact ? 14 : 16),
-                  SizedBox(width: isCompact ? 4 : 8),
-                  Text(
-                    DateFormat(isCompact ? 'dd/MM' : 'dd/MM/yyyy')
-                        .format(widget.selectedDate),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: isCompact ? 12 : 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          SizedBox(width: 16),
-
-          // Action buttons - adapt based on screen size
-          if (!isCompact) ...[
-            // Full buttons for large screens
-            ElevatedButton.icon(
-              onPressed: widget.onAddNew,
-              icon: Icon(Icons.add, size: 16),
-              label: Text('Add New'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-            ),
-            SizedBox(width: 8),
-            ElevatedButton.icon(
-              onPressed: widget.onSave,
-              icon: Icon(Icons.save, size: 16),
-              label: Text('Save All'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.withValues(alpha: 0.9),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-            ),
-            SizedBox(width: 8),
-            ElevatedButton.icon(
-              onPressed: () => _handleExport(context),
-              icon: Icon(Icons.file_download, size: 16),
-              label: Text('Export Excel'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.withValues(alpha: 0.9),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-            ),
-          ] else ...[
-            // Compact buttons for medium screens
-            ElevatedButton.icon(
-              onPressed: widget.onAddNew,
-              icon: Icon(Icons.add, size: 14),
-              label: Text('Add'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white.withValues(alpha: 0.1),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              ),
-            ),
-            SizedBox(width: 6),
-            ElevatedButton.icon(
-              onPressed: widget.onSave,
-              icon: Icon(Icons.save, size: 14),
-              label: Text('Save'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.withValues(alpha: 0.9),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              ),
-            ),
-            SizedBox(width: 6),
-            ElevatedButton(
-              onPressed: () => _handleExport(context),
-              child: Icon(Icons.file_download, size: 14),
-              // Icon only for very compact
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.withValues(alpha: 0.9),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
 
 
   @override
@@ -794,7 +194,17 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                 topRight: Radius.circular(12),
               ),
             ),
-            child: _buildResponsiveHeader(context),
+            child: BuildResponsiveHeader(
+              tripCount: _trips.length,
+              totalSuppliers: _totalSuppliers ?? 0,
+              totalStorages: _totalStorages ?? 0,
+              totalVehicles: _trips.length,
+              selectedDate: widget.selectedDate,
+              onDateChange: widget.onDateChange,
+              onAddNew: widget.onAddNew,
+              onSave: widget.onSave,
+              onExport: () => _handleExport(context),
+            ),
           ),
 
           // Table content with proper scrolling
@@ -821,46 +231,54 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                               Expanded(
                                 flex: 1,
                                 child: Text('Trip #',
-                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
                               ),
                               Expanded(
                                 flex: 1,
                                 child: Text('Vehicle NO',
-                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
                               ),
                               Expanded(
                                 flex: 2,
                                 child: Text('Storage Name',
-                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
                               ),
                               Expanded(
                                 flex: 2,
                                 child: Center(
                                   child: Text('Suppliers',
-                                      style: TextStyle(fontWeight: FontWeight.w600)),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600)),
                                 ),
                               ),
                               Expanded(
                                 flex: 2,
                                 child: Text('Procurement Specialist',
-                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
                               ),
                               Expanded(
                                 flex: 1,
                                 child: Text('Fleet Supervisor',
-                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
                               ),
                               Expanded(
                                 flex: 2,
                                 child: Center(
                                   child: Text('Trip Duration',
-                                      style: TextStyle(fontWeight: FontWeight.w600)),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600)),
                                 ),
                               ),
                               Expanded(
                                 flex: 1,
                                 child: Text('Actions',
-                                    style: TextStyle(fontWeight: FontWeight.w600)),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
                               ),
                             ],
                           ),
@@ -875,7 +293,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                             Container(
                               decoration: BoxDecoration(
                                 border: Border(
-                                  bottom: BorderSide(color: Colors.grey.shade200),
+                                  bottom:
+                                      BorderSide(color: Colors.grey.shade200),
                                 ),
                               ),
                               child: Padding(
@@ -894,9 +313,11 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                                   : Icons.keyboard_arrow_right,
                                               size: 20,
                                             ),
-                                            onPressed: () => _toggleExpansion(index),
+                                            onPressed: () =>
+                                                _toggleExpansion(index),
                                             style: IconButton.styleFrom(
-                                              backgroundColor: Colors.grey.shade100,
+                                              backgroundColor:
+                                                  Colors.grey.shade100,
                                               minimumSize: Size(32, 32),
                                             ),
                                           ),
@@ -907,7 +328,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                   color: Colors.grey.shade300),
-                                              borderRadius: BorderRadius.circular(4),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
                                             ),
                                             child: Text('${index + 1}'),
                                           ),
@@ -918,17 +340,20 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                     Expanded(
                                       flex: 1,
                                       child: Container(
-                                        margin: EdgeInsets.symmetric(horizontal: 4),
+                                        margin:
+                                            EdgeInsets.symmetric(horizontal: 4),
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
                                           color: Colors.grey.shade500,
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
                                         ),
                                         child: Center(
                                           child: Text(
                                             trip.vehicleCode,
-                                            style: TextStyle(color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ),
@@ -937,7 +362,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                     Expanded(
                                       flex: 2,
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 4),
                                         child: _buildStorageCell(trip),
                                       ),
                                     ),
@@ -945,7 +371,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                     Expanded(
                                       flex: 2,
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 4),
                                         child: _buildSupplierCell(trip),
                                       ),
                                     ),
@@ -953,7 +380,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                     Expanded(
                                       flex: 2,
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 4),
                                         child: Text(
                                           trip.procurementSpecialist,
                                           overflow: TextOverflow.ellipsis,
@@ -964,7 +392,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                     Expanded(
                                       flex: 1,
                                       child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 4),
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 4),
                                         child: Text(
                                           trip.fleetSupervisor,
                                           overflow: TextOverflow.ellipsis,
@@ -975,12 +404,14 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                     Expanded(
                                       flex: 2,
                                       child: Container(
-                                        margin: EdgeInsets.symmetric(horizontal: 4),
+                                        margin:
+                                            EdgeInsets.symmetric(horizontal: 4),
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
                                           color: Colors.blue.shade50,
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -995,7 +426,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                     Expanded(
                                       flex: 1,
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
                                         children: [
                                           IconButton(
                                             icon: Icon(Icons.edit, size: 16),
@@ -1003,30 +435,38 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                                                 widget.onEdit(trip, context),
                                             tooltip: 'Edit record',
                                             style: IconButton.styleFrom(
-                                              backgroundColor: Colors.blue.shade50,
-                                              foregroundColor: Colors.blue.shade600,
+                                              backgroundColor:
+                                                  Colors.blue.shade50,
+                                              foregroundColor:
+                                                  Colors.blue.shade600,
                                               minimumSize: Size(28, 28),
                                               padding: EdgeInsets.zero,
                                             ),
                                           ),
                                           IconButton(
                                             icon: Icon(Icons.copy, size: 16),
-                                            onPressed: () => widget.onCopy(trip.id!),
+                                            onPressed: () =>
+                                                widget.onCopy(trip.id!),
                                             tooltip: 'Copy record',
                                             style: IconButton.styleFrom(
-                                              backgroundColor: Colors.green.shade50,
-                                              foregroundColor: Colors.green.shade600,
+                                              backgroundColor:
+                                                  Colors.green.shade50,
+                                              foregroundColor:
+                                                  Colors.green.shade600,
                                               minimumSize: Size(28, 28),
                                               padding: EdgeInsets.zero,
                                             ),
                                           ),
                                           IconButton(
                                             icon: Icon(Icons.delete, size: 16),
-                                            onPressed: () => widget.onDelete(trip),
+                                            onPressed: () =>
+                                                widget.onDelete(trip),
                                             tooltip: 'Delete record',
                                             style: IconButton.styleFrom(
-                                              backgroundColor: Colors.red.shade50,
-                                              foregroundColor: Colors.red.shade600,
+                                              backgroundColor:
+                                                  Colors.red.shade50,
+                                              foregroundColor:
+                                                  Colors.red.shade600,
                                               minimumSize: Size(28, 28),
                                               padding: EdgeInsets.zero,
                                             ),
@@ -1042,7 +482,8 @@ class _DataTableWidgetState extends State<DataTableWidget> {
                             if (trip.isExpanded)
                               Container(
                                 width: double.infinity,
-                                child: _buildExpandedDetails(trip),
+                                child:
+                                    buildExpandedDetails(trip, _formatDateTime),
                               ),
                           ],
                         );

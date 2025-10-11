@@ -1,142 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/models/storage_data.dart';
+import 'package:form_flow/core/data/constant/trips_data_dashboard_temp.dart';
+import 'package:form_flow/models/shipment_model.dart';
 import 'package:form_flow/models/trip_data.dart';
 import 'package:form_flow/widgets/add_edit_dialog.dart';
 import 'package:get/get.dart';
-import '../models/supplier_data.dart';
+enum DashboardControllerMode {
+  addedNew,
+  edit,
+}
 
 class DashboardController extends GetxController {
-  var trips = <TripData>[
-    TripData(
-        id: 1,
-        vehicleCode: "0081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 2,
-        vehicleCode: "2081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 3,
-        vehicleCode: "3081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 4,
-        vehicleCode: "4081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 5,
-        vehicleCode: "5081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 6,
-        vehicleCode: "6081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 7,
-        vehicleCode: "7081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 8,
-        vehicleCode: "8081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-    TripData(
-        id: 9,
-        vehicleCode: "9081",
-        storages: [
-          StorageData(id: 1, name: "MAIN EXP. WAREHOUSE"),
-          StorageData(id: 2, name: "MAIN EXP222. WAREHOUSE")
-        ],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY"),
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA1 PHARMA COMPANY"),
-        ]),
-    TripData(
-        id: 10,
-        vehicleCode: "90181",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
-        procurementSpecialist: "procurementSpecialist",
-        fleetSupervisor: "Ahmed Fouad",
-        suppliers: [
-          SupplierData(
-              actualArriveDate: DateTime(2025, 10, 23),
-              actualDepartureDate: DateTime(2025, 10, 24),
-              supplierName: "HIKMA PHARMA COMPANY")
-        ]),
-  ].obs;
+  // var trips = TripsTempData.tripsTempData.obs;
+  var trips = <TripData >[].obs;
+  String? deliveryName;
+  DateTime? deliveryDate;
+  final DashboardControllerMode mode;
+  final SupplyDeliveryData? data ;
+  DashboardController({this.data, required this.mode});
 
-  var selectedDate = DateTime.now().add(Duration(days: 1)).obs;
+  @override
+  void onInit() {
+    super.onInit();
+    if (mode == DashboardControllerMode.edit){
+      trips.assignAll(data!.trips);
+      deliveryName = data!.name;
+      deliveryDate = data!.date;
+    }
+    deliveryName = "delivery Name";
+    deliveryDate = DateTime.now();
+
+  }
+
+  var selectedDate = DateTime
+      .now()
+      .add(Duration(days: 1))
+      .obs;
 
   void setSelectedDate(DateTime date) {
     selectedDate.value = date;
@@ -152,10 +50,11 @@ class DashboardController extends GetxController {
   void showEditDialog(TripData record, BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AddEditDialog(
-        mode: DialogMode.edit,
-        editData: record,
-      ),
+      builder: (context) =>
+          AddEditDialog(
+            mode: DialogMode.edit,
+            editData: record,
+          ),
     );
   }
 
@@ -164,7 +63,8 @@ class DashboardController extends GetxController {
     Get.defaultDialog(
       title: 'Delete Record',
       middleText:
-          'This will permanently delete the record for suppliers ${record.suppliers.map((sup) {
+      'This will permanently delete the record for suppliers ${record.suppliers
+          .map((sup) {
         return " ${sup.supplierName} ";
       })} with Car ID ${record.vehicleCode}. This action cannot be undone.',
       textCancel: 'Cancel',
@@ -225,9 +125,9 @@ class DashboardController extends GetxController {
     final newId = trips.isEmpty
         ? 1
         : trips.map((tripData) => tripData.id).reduce(
-                (maximumValue, nextValue) =>
-                    maximumValue! > nextValue! ? maximumValue : nextValue)! +
-            1;
+            (maximumValue, nextValue) =>
+        maximumValue! > nextValue! ? maximumValue : nextValue)! +
+        1;
     trips.add(record.copyWith(id: newId));
   }
 

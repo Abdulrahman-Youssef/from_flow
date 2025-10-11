@@ -26,7 +26,7 @@ class HomeScreen extends GetView<HomeController> {
         children: [
           // Header Section
           homeHeaderSection(
-            onAddNewDelivery: () {},
+            onAddNewDelivery: controller.onAddNewDelivery,
             totalDeliveries: controller.deliveries.length,
           ),
 
@@ -39,7 +39,7 @@ class HomeScreen extends GetView<HomeController> {
           // Deliveries Grid
           Expanded(
             child: Obx(() => controller.filteredDeliveries.isEmpty
-                ? buildEmptyState(onAddNewDelivery: onAddNewDelivery)
+                ? buildEmptyState(onAddNewDelivery: controller.onAddNewDelivery)
                 : LayoutBuilder(
                     builder: (context, constraints) {
                       return GridView.builder(
@@ -56,7 +56,7 @@ class HomeScreen extends GetView<HomeController> {
                           final delivery = controller.filteredDeliveries[index];
                           return buildDeliveryCard(
                             delivery: delivery,
-                            onDeliveryTap: onDeliveryTap,
+                            onDeliveryTap: controller.onEditeDelivery,
                           );
                         },
                       );
@@ -68,53 +68,53 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // Widget _buildStatCard(String title, String titleArabic, String value,
-  //     IconData icon, Color backgroundColor) {
-  //   return Expanded(
-  //     child: Container(
-  //       padding: EdgeInsets.all(16),
-  //       decoration: BoxDecoration(
-  //         color: backgroundColor,
-  //         borderRadius: BorderRadius.circular(12),
-  //       ),
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Row(
-  //             children: [
-  //               Icon(icon, color: Colors.white, size: 24),
-  //               Spacer(),
-  //               Text(
-  //                 value,
-  //                 style: TextStyle(
-  //                   fontSize: 24,
-  //                   fontWeight: FontWeight.bold,
-  //                   color: Colors.white,
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //           SizedBox(height: 8),
-  //           Text(
-  //             title,
-  //             style: TextStyle(
-  //               fontSize: 12,
-  //               color: Colors.white.withValues(alpha: 0.8),
-  //               fontWeight: FontWeight.w500,
-  //             ),
-  //           ),
-  //           Text(
-  //             titleArabic,
-  //             style: TextStyle(
-  //               fontSize: 10,
-  //               color: Colors.white.withValues(alpha: 0.6),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+// Widget _buildStatCard(String title, String titleArabic, String value,
+//     IconData icon, Color backgroundColor) {
+//   return Expanded(
+//     child: Container(
+//       padding: EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: backgroundColor,
+//         borderRadius: BorderRadius.circular(12),
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Row(
+//             children: [
+//               Icon(icon, color: Colors.white, size: 24),
+//               Spacer(),
+//               Text(
+//                 value,
+//                 style: TextStyle(
+//                   fontSize: 24,
+//                   fontWeight: FontWeight.bold,
+//                   color: Colors.white,
+//                 ),
+//               ),
+//             ],
+//           ),
+//           SizedBox(height: 8),
+//           Text(
+//             title,
+//             style: TextStyle(
+//               fontSize: 12,
+//               color: Colors.white.withValues(alpha: 0.8),
+//               fontWeight: FontWeight.w500,
+//             ),
+//           ),
+//           Text(
+//             titleArabic,
+//             style: TextStyle(
+//               fontSize: 10,
+//               color: Colors.white.withValues(alpha: 0.6),
+//             ),
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }
 
 // Widget buildDeliveryCard(SupplyDeliveryData delivery) {
 //   return Card(

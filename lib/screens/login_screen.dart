@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/controller/home_controller.dart';
+import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:get/get.dart';
 import '../app_state.dart';
 
@@ -25,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (_usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
         Get.lazyPut<HomeController>(() => HomeController());
         Get.find<AppController>().login();
-
+        Get.toNamed(AppRoutes.homePage);
       }
     }
   }

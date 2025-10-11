@@ -1,3 +1,5 @@
+import 'package:form_flow/controller/dashboard_controller.dart';
+import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:form_flow/models/shipment_model.dart';
 import 'package:intl/intl.dart';
@@ -55,6 +57,7 @@ class HomeController extends GetxController {
   }
 
   void addDelivery(SupplyDeliveryData delivery) {
+    Get.toNamed("Dashboard");
     deliveries.add(delivery);
   }
 
@@ -67,6 +70,28 @@ class HomeController extends GetxController {
       deliveries[index] = delivery;
     }
   }
+
+  void onAddNewDelivery () {
+    Get.toNamed(AppRoutes.dashboard,
+        arguments: {
+          // cuz it added new
+          "data": null,
+          "mode": DashboardControllerMode.addedNew,
+        }
+    );
+  }
+
+    void onEditeDelivery (SupplyDeliveryData data){
+      Get.toNamed(AppRoutes.dashboard,
+          arguments: {
+            // cuz it added new
+            "data" : data,
+            "mode" : DashboardControllerMode.edit,
+          }
+      );
+
+  }
+
 
   int getCrossAxisCount(double width) {
     if (width > 1200) return 4;

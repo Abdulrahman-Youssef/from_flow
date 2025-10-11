@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:form_flow/core/data/constant/Deliveries.dart';
-import 'package:form_flow/models/supplier_data.dart';
-import 'package:form_flow/models/trip_data.dart';
-import 'package:form_flow/screens/home_screen.dart';
+import 'package:form_flow/core/data/constant/app_routes.dart';
+import 'package:form_flow/routing.dart';
 import 'package:get/get.dart';
 import 'app_state.dart';
-import 'models/shipment_model.dart';
-import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
 
 void main() {
   Get.put(AppController());
@@ -19,6 +14,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      initialRoute: AppRoutes.login,
+      getPages: MyRouting.routes,
       title: 'Supply Chain Manager',
       theme: ThemeData(
         primarySwatch: MaterialColor(0xFF1E3A8A, {
@@ -66,18 +63,6 @@ class MyApp extends StatelessWidget {
             borderSide: BorderSide(color: Color(0xFF1E3A8A), width: 2),
           ),
         ),
-      ),
-      home: GetX<AppController>(
-        builder: (controller) {
-          return controller.isLoggedIn.value
-              // ? DashboardScreen()
-              ? HomeScreen(
-                  // deliveries: homeScreenList,
-                  onDeliveryTap: (SupplyDeliveryData p1) {},
-                  onAddNewDelivery: () {},
-                )
-              : LoginScreen();
-        },
       ),
       debugShowCheckedModeBanner: false,
     );

@@ -4,16 +4,16 @@ import 'package:get/get.dart';
 import '../app_state.dart';
 import '../widgets/data_table_widget.dart';
 
-class DashboardScreen extends StatelessWidget {
-  DashboardScreen({super.key});
 
-  final controller = Get.put(DashboardController());
+
+class DashboardScreen extends GetView<DashboardController> {
+  const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Supply Chain Management System'),
+        title: Text("${controller.deliveryName}"),
         automaticallyImplyLeading: false,
         actions: [
           Padding(

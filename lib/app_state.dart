@@ -11,6 +11,6 @@ class AppController extends GetxController {
   }
 
   void logout() {
-    isLoggedIn.value = false;
+  Get.back();
   }
 }
