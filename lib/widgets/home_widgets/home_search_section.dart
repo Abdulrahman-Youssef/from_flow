@@ -6,11 +6,11 @@ class SearchAndSortBar extends StatelessWidget {
   final String currentSortBy;
 
   const SearchAndSortBar({
-    Key? key,
+    super.key,
     required this.onSearchChanged,
     required this.onSortChanged,
     required this.currentSortBy,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
