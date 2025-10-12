@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/app_state.dart';
 import 'package:form_flow/controller/home_controller.dart';
 import 'package:form_flow/models/shipment_model.dart';
 import 'package:form_flow/widgets/home_widgets/home_build_delivery_card.dart';
@@ -27,7 +28,7 @@ class HomeScreen extends GetView<HomeController> {
           // Header Section
           homeHeaderSection(
             onAddNewDelivery: controller.onAddNewDelivery,
-            totalDeliveries: controller.deliveries.length,
+            totalDeliveries: controller.deliveries.length, onLogout: Get.find<AppController>().logout,
           ),
 
           // Search and Filter Section

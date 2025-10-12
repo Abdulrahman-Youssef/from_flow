@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-// The header is now a function that accepts parameters for its data and actions.
+// The header now accepts an onLogout function.
 Widget homeHeaderSection({
   required VoidCallback onAddNewDelivery,
   required int totalDeliveries,
+  required VoidCallback onLogout, // New parameter for the logout action
 }) {
   return Container(
     decoration: const BoxDecoration(
@@ -18,13 +19,14 @@ Widget homeHeaderSection({
     ),
     child: SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(24, 24, 16, 24), // Adjusted padding for the icon button
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title and Add Button
+            // Title and Action Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,18 +49,29 @@ Widget homeHeaderSection({
                     ),
                   ],
                 ),
-                ElevatedButton.icon(
-                  onPressed: onAddNewDelivery, // Use the parameter here
-                  icon: const Icon(Icons.add, size: 20),
-                  label: const Text('New Delivery'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF1E3A8A),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                // Grouped the buttons together in a Row
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: onAddNewDelivery,
+                      icon: const Icon(Icons.add, size: 20),
+                      label: const Text('New Delivery'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1E3A8A),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
-                  ),
+                    // The new logout button
+                    IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.white, size: 28),
+                      onPressed: onLogout,
+                      tooltip: 'Logout',
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -66,11 +79,10 @@ Widget homeHeaderSection({
             // Stats Row
             Row(
               children: [
-                // Pass the delivery count from the parameter
                 _buildStatCard(
                   'Total Deliveries',
                   'إجمالي التوريدات',
-                  totalDeliveries.toString(), // Use the parameter here
+                  totalDeliveries.toString(),
                   Icons.local_shipping,
                   const Color.fromRGBO(255, 255, 255, 0.2),
                 ),
@@ -83,7 +95,7 @@ Widget homeHeaderSection({
   );
 }
 
-// A sample implementation for _buildStatCard so the code is complete.
+// Helper widget remains the same
 Widget _buildStatCard(String title, String titleArabic, String value, IconData icon, Color backgroundColor) {
   return Expanded(
     child: Container(

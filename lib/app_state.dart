@@ -4,13 +4,12 @@ import 'models/supplier_data.dart';
 class AppController extends GetxController {
   var isLoggedIn = false.obs;
 
-  var selectedDate = DateTime.now().add(Duration(days: 1)).obs;
-
   void login() {
     isLoggedIn.value = true;
   }
 
   void logout() {
-  Get.back();
+    isLoggedIn.value = false;
+    Get.back();
   }
 }

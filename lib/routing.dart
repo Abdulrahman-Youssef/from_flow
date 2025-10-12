@@ -11,8 +11,6 @@ import 'screens/home_screen.dart';
 
 class MyRouting {
   // Route names
-
-
   // Route pages
   static final List<GetPage> routes = [
     GetPage(

@@ -33,7 +33,7 @@ class DashboardScreen extends GetView<DashboardController> {
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () {
-              Get.find<AppController>().logout();
+              Get.back();
             },
           ),
           SizedBox(width: 8),
