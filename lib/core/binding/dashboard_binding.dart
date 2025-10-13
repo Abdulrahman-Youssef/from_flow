@@ -14,7 +14,7 @@ class DashboardBinding extends Bindings {
 
     // 3. Create and register your controller with the dynamic data
     Get.put<DashboardController>(
-      DashboardController(data: data, mode: mode),
+      DashboardController(delivery: data, mode: mode),
     );
   }
 }

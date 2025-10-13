@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-// The header now accepts an onLogout function.
 Widget homeHeaderSection({
+  required String userName,
   required VoidCallback onAddNewDelivery,
   required int totalDeliveries,
-  required VoidCallback onLogout, // New parameter for the logout action
+  required VoidCallback onLogout,
+  required VoidCallback onSettingsTap,
+  required VoidCallback onUserTap,
 }) {
   return Container(
     decoration: const BoxDecoration(
@@ -19,7 +21,7 @@ Widget homeHeaderSection({
     ),
     child: SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 16, 24), // Adjusted padding for the icon button
+        padding: const EdgeInsets.fromLTRB(24, 24, 8, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -28,44 +30,62 @@ Widget homeHeaderSection({
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Supply Chain Management',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Username has been moved from here
+                      Text(
+                        'Supply Chain Management',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'إدارة سلسلة التوريد',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color.fromRGBO(255, 255, 255, 0.8),
+                      SizedBox(height: 4),
+                      Text(
+                        'إدارة سلسلة التوريد',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color.fromRGBO(255, 255, 255, 0.8),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                // Grouped the buttons together in a Row
+                // Action buttons row
                 Row(
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: onAddNewDelivery,
-                      icon: const Icon(Icons.add, size: 20),
-                      label: const Text('New Delivery'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF1E3A8A),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    // Tappable User Profile section with name
+                    InkWell(
+                      onTap: onUserTap,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.account_circle, color: Colors.white, size: 28),
+                            const SizedBox(width: 8),
+                            Text(
+                              userName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+
+                          ],
                         ),
                       ),
                     ),
-                    // The new logout button
+                    IconButton(
+                      icon: const Icon(Icons.settings, color: Colors.white, size: 28),
+                      onPressed: onSettingsTap,
+                      tooltip: 'Settings',
+                    ),
                     IconButton(
                       icon: const Icon(Icons.logout, color: Colors.white, size: 28),
                       onPressed: onLogout,
@@ -76,8 +96,10 @@ Widget homeHeaderSection({
               ],
             ),
             const SizedBox(height: 24),
-            // Stats Row
+            // Stats and Add Button Row
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _buildStatCard(
                   'Total Deliveries',
@@ -85,6 +107,20 @@ Widget homeHeaderSection({
                   totalDeliveries.toString(),
                   Icons.local_shipping,
                   const Color.fromRGBO(255, 255, 255, 0.2),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton.icon(
+                  onPressed: onAddNewDelivery,
+                  icon: const Icon(Icons.add, size: 20),
+                  label: const Text('New Delivery'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF1E3A8A),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:form_flow/models/shipment_model.dart';
 import 'package:intl/intl.dart';
-
 import '../core/data/constant/Deliveries.dart';
 
 class HomeController extends GetxController {
@@ -83,25 +83,59 @@ class HomeController extends GetxController {
     }
   }
 
-  void onAddNewDelivery () {
-    Get.toNamed(AppRoutes.dashboard,
+  Future<void> onAddNewDelivery () async {
+   var   result = await Get.toNamed(AppRoutes.dashboard,
         arguments: {
           // cuz it added new
           "data": null,
           "mode": DashboardControllerMode.addedNew,
         }
     );
-  }
+    if(result != null)
+    {
+      deliveries.add( result);
 
-    void onEditeDelivery (SupplyDeliveryData data){
-      Get.toNamed(AppRoutes.dashboard,
-          arguments: {
-            // cuz it added new
-            "data" : data,
-            "mode" : DashboardControllerMode.edit,
-          }
+      Get.snackbar(
+        'Success',
+        'Delivery "${result.name}" saved successfully!',
+        // 'Delivery "{finalDelivery.name}" saved successfully!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
       );
 
+    }
+  }
+
+  // ✨ THIS IS THE METHOD TO CHANGE ✨
+  Future<void> onEditeDelivery(SupplyDeliveryData data) async {
+    // 1. Await the result from the dashboard screen
+    final result = await Get.toNamed(
+      AppRoutes.dashboard,
+      arguments: {
+        "data": data,
+        "mode": DashboardControllerMode.edit,
+      },
+    );
+
+    // 2. Check if the result is valid and update the list
+    if (result != null && result is SupplyDeliveryData) {
+      // Find the index of the old delivery data using its unique ID
+      final index = deliveries.indexWhere((d) => d.id == result.id);
+
+      // If found, update it in the list
+      if (index != -1) {
+        // This will automatically refresh your UI because `deliveries` is an .obs list!
+        updateDelivery(index, result);
+      }
+
+      Get.snackbar(
+        'Success',
+        'Delivery "${result.name}" saved successfully!',
+        // 'Delivery "{finalDelivery.name}" saved successfully!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    }
   }
 
 

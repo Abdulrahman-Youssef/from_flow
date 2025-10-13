@@ -28,7 +28,11 @@ class HomeScreen extends GetView<HomeController> {
           // Header Section
           homeHeaderSection(
             onAddNewDelivery: controller.onAddNewDelivery,
-            totalDeliveries: controller.deliveries.length, onLogout: Get.find<AppController>().logout,
+            totalDeliveries: controller.deliveries.length,
+            onLogout: Get.find<AppController>().logout,
+            onSettingsTap: () {},
+            onUserTap: () {},
+            userName: 'ahmed',
           ),
 
           // Search and Filter Section
