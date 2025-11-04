@@ -3,7 +3,11 @@ import 'package:form_flow/models/shipment_model.dart';
 import 'package:form_flow/widgets/home_widgets/home_build_mini_state.dart';
 import 'package:intl/intl.dart';
 
-Widget buildDeliveryCard({required SupplyDeliveryData delivery ,required void Function(SupplyDeliveryData) onDeliveryTap }) {
+Widget buildDeliveryCard({
+  required SupplyDeliveryData delivery,
+  required void Function(SupplyDeliveryData) onDeliveryTap,
+  required void Function(String id) onDeleteTap, // Added delete callback
+}) {
   return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -11,18 +15,19 @@ Widget buildDeliveryCard({required SupplyDeliveryData delivery ,required void Fu
       onTap: () => onDeliveryTap(delivery),
       borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header with name and date
+            // Header with name, date, and delete button
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Text(
                     delivery.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF1E3A8A),
@@ -31,26 +36,40 @@ Widget buildDeliveryCard({required SupplyDeliveryData delivery ,required void Fu
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Color(0xFF1E3A8A).withValues(alpha: 0.1),
+                    color: const Color(0xFF1E3A8A).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     DateFormat('dd/MM').format(delivery.date),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1E3A8A),
                     ),
                   ),
                 ),
+                // **** START: DELETE BUTTON ADDED ****
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 18,
+                    splashRadius: 20,
+                    icon: Icon(Icons.delete_outline, color: Colors.red.shade700),
+                    onPressed: () => onDeleteTap(delivery.id.toString()),
+                  ),
+                ),
+                // **** END: DELETE BUTTON ADDED ****
               ],
             ),
 
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
 
             Text(
               DateFormat('EEEE, dd MMMM yyyy').format(delivery.date),
@@ -59,8 +78,8 @@ Widget buildDeliveryCard({required SupplyDeliveryData delivery ,required void Fu
                 color: Colors.grey.shade600,
               ),
             ),
-            SizedBox(height: 12),
-            // Stats Grid
+            const SizedBox(height: 12),
+            // Stats Grid (no changes below this line)
             Row(
               children: [
                 Expanded(
@@ -72,7 +91,7 @@ Widget buildDeliveryCard({required SupplyDeliveryData delivery ,required void Fu
                     Colors.blue,
                   ),
                 ),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Expanded(
                   child: buildMiniStat(
                     delivery.suppliersCount.toString(),
@@ -84,7 +103,7 @@ Widget buildDeliveryCard({required SupplyDeliveryData delivery ,required void Fu
                 ),
               ],
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Row(
               children: [
                 Expanded(
@@ -96,8 +115,8 @@ Widget buildDeliveryCard({required SupplyDeliveryData delivery ,required void Fu
                     Colors.orange,
                   ),
                 ),
-                SizedBox(width: 6),
-                Expanded(child: SizedBox()),
+                const SizedBox(width: 6),
+                const Expanded(child: SizedBox()),
               ],
             ),
           ],

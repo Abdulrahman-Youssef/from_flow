@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:form_flow/core/binding/app_binding.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:form_flow/routing.dart';
 import 'package:get/get.dart';
 import 'app_state.dart';
 
 void main() {
+
   Get.put(AppController());
   runApp(MyApp());
 }
@@ -14,6 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      initialBinding: AppBinding(),
       initialRoute: AppRoutes.login,
       getPages: MyRouting.routes,
       title: 'Supply Chain Manager',

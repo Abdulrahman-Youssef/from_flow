@@ -16,23 +16,21 @@ class HomeController extends GetxController {
   // Getters
   List<SupplyDeliveryData> get filteredDeliveries {
     List<SupplyDeliveryData> filtered = deliveries.where((delivery) {
-
-      bool matchesSearch = false ;
+      bool matchesSearch = false;
       switch (sortBy.value) {
         case 'name':
-          return  matchesSearch = delivery.name
+          return matchesSearch = delivery.name
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase());
         case 'trips':
-          return matchesSearch= delivery.trips.length.toString() == searchQuery.value ;
+          return matchesSearch =
+              delivery.trips.length.toString() == searchQuery.value;
         case 'date':
         default:
           return matchesSearch = DateFormat('dd/MM/yyyy')
               .format(delivery.date)
               .contains(searchQuery.value); // Most recent first
       }
-
-
 
       return matchesSearch;
     }).toList();
@@ -73,9 +71,10 @@ class HomeController extends GetxController {
     deliveries.add(delivery);
   }
 
-  void removeDelivery(SupplyDeliveryData delivery) {
-    deliveries.remove(delivery);
+  void removeDelivery(String deliveryID) {
+    deliveries.removeWhere((delivery) => delivery.id == deliveryID);
   }
+
   // put the edited
   void updateDelivery(int index, SupplyDeliveryData delivery) {
     if (index >= 0 && index < deliveries.length) {
@@ -83,17 +82,14 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> onAddNewDelivery () async {
-   var   result = await Get.toNamed(AppRoutes.dashboard,
-        arguments: {
-          // cuz it added new
-          "data": null,
-          "mode": DashboardControllerMode.addedNew,
-        }
-    );
-    if(result != null)
-    {
-      deliveries.add( result);
+  Future<void> onAddNewDelivery() async {
+    var result = await Get.toNamed(AppRoutes.dashboard, arguments: {
+      // cuz it added new
+      "data": null,
+      "mode": DashboardControllerMode.addedNew,
+    });
+    if (result != null) {
+      deliveries.add(result);
 
       Get.snackbar(
         'Success',
@@ -102,7 +98,6 @@ class HomeController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-
     }
   }
 
@@ -137,7 +132,6 @@ class HomeController extends GetxController {
       );
     }
   }
-
 
   int getCrossAxisCount(double width) {
     if (width > 1200) return 4;

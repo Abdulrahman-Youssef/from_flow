@@ -122,7 +122,7 @@ class DashboardController extends GetxController {
   void handleCopy(int id) {
     copyRecord(id);
     Get.snackbar(
-       duration: 650.milliseconds,
+      duration: 650.milliseconds,
       'Success',
       'Record copied successfully',
       backgroundColor: Colors.green,
@@ -153,15 +153,20 @@ class DashboardController extends GetxController {
       // ADD NEW MODE: Create a brand new SupplyDeliveryData object
       finalDelivery = SupplyDeliveryData(
         // Generate a unique ID for the new delivery
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: DateTime.now().millisecondsSinceEpoch,
         name: deliveryName.value,
-        date: deliveryDate!, // Make sure this is set
+        date: deliveryDate!,
+        // Make sure this is set
         trips: trips.toList(),
+        createdBy: 'Ahmed',
       );
     }
 
     // Return the new or updated object to the previous screen
-    Get.back(result: finalDelivery , closeOverlays: true,);
+    Get.back(
+      result: finalDelivery,
+      closeOverlays: true,
+    );
   }
 
   void deleteRecord(int id) {

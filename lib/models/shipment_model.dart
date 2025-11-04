@@ -1,25 +1,39 @@
 import 'package:form_flow/models/trip_data.dart';
 
 class SupplyDeliveryData {
-  final String id;
+  final int id;
   final String name;
   final DateTime date;
   final List<TripData> trips;
+
+  // --- NEW FIELDS ---
+  final String createdBy;
+  final String? editedBy;
+  final DateTime? lastEditedAt;
+  // ------------------
 
   SupplyDeliveryData({
     required this.id,
     required this.name,
     required this.date,
     required this.trips,
+    // Add new fields to the constructor
+    required this.createdBy,
+    this.editedBy,
+    this.lastEditedAt,
   });
 
   // ✨ ADD THIS METHOD ✨
   // It creates a copy of the current object, allowing you to override specific fields.
   SupplyDeliveryData copyWith({
-    String? id,
+    int? id,
     String? name,
     DateTime? date,
     List<TripData>? trips,
+    // Add new fields to copyWith
+    String? createdBy,
+    String? editedBy,
+    DateTime? lastEditedAt,
   }) {
     return SupplyDeliveryData(
       // Use the new value if provided, otherwise use the old one (`this.name`).
@@ -27,6 +41,10 @@ class SupplyDeliveryData {
       name: name ?? this.name,
       date: date ?? this.date,
       trips: trips ?? this.trips,
+      // Pass along the new or old values
+      createdBy: createdBy ?? this.createdBy,
+      editedBy: editedBy ?? this.editedBy,
+      lastEditedAt: lastEditedAt ?? this.lastEditedAt,
     );
   }
 

@@ -1,35 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/controller/home_controller.dart';
-import 'package:form_flow/core/data/constant/app_routes.dart';
+import 'package:form_flow/controller/login_controller.dart';
 import 'package:get/get.dart';
-import '../app_state.dart';
 
-class LoginScreen extends StatefulWidget {
+// Now a stateless GetView!
+class LoginScreen extends GetView<LoginScreenController> {
+  // Initialize the controller.
+  // This will be kept in memory by GetX.
   @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _handleLogin() {
-    if (_formKey.currentState!.validate()) {
-      if (_usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
-        Get.lazyPut<HomeController>(() => HomeController());
-        Get.find<AppController>().login();
-        Get.toNamed(AppRoutes.homePage);
-      }
-    }
-  }
+  final controller = Get.put(LoginScreenController());
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 constraints: BoxConstraints(maxWidth: 400),
                 child: Column(
                   children: [
-                    // Header
+                    // Header (unchanged)
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(24.0),
@@ -93,11 +71,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: EdgeInsets.all(24.0),
                       child: Form(
-                        key: _formKey,
+                        // Use the key from the controller
+                        key: controller.formKey,
                         child: Column(
                           children: [
                             TextFormField(
-                              controller: _usernameController,
+                              // Use the controller from the controller
+                              controller: controller.usernameController,
                               decoration: InputDecoration(
                                 labelText: 'Username',
                                 hintText: 'Enter your username',
@@ -115,7 +95,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             SizedBox(height: 16),
                             TextFormField(
-                              controller: _passwordController,
+                              // Use the controller from the controller
+                              controller: controller.passwordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 labelText: 'Password',
@@ -136,16 +117,34 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               width: double.infinity,
                               height: 48,
-                              child: ElevatedButton(
-                                onPressed: _handleLogin,
-                                child: Text(
-                                  'Sign In',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                              // --- 1. WRAP YOUR BUTTON WITH Obx ---
+                              // Obx will rebuild this widget when any .obs
+                              // variable inside it changes.
+                              child: Obx(() {
+                                return ElevatedButton(
+                                  // --- 2. MAKE onPressed CONDITIONAL ---
+                                  // This disables the button when isLoading is true
+                                  onPressed: controller.isLoading.value
+                                      ? null
+                                      : controller.handleLogin,
+
+                                  // --- 3. MAKE THE CHILD CONDITIONAL ---
+                                  child: controller.isLoading.value
+                                  // Show a spinner if loading
+                                      ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 3,
+                                  )
+                                  // Show text if not loading
+                                      : Text(
+                                    'Sign In',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                              ),
+                                );
+                              }), // <-- End of Obx
                             ),
                           ],
                         ),
