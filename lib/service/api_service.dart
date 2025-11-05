@@ -1,13 +1,17 @@
 import 'package:dio/dio.dart';
-import 'package:get/get_connect/http/src/response/response.dart' hide Response;
+import 'package:get/get.dart' hide Response;
+// import 'package:get/get_connect/http/src/response/response.dart' hide Response; // Not needed
+import 'auth_service.dart';
 
 class ApiService {
+  // This is fine. GetX will find the service from your AppBinding.
+  final AuthService _authService = Get.find<AuthService>();
+
   // 1. The Base URL for your API
   static const String _baseUrl = "https://api-ibn-sina.abdulrahman.lt/api";
 
   // 2. The Singleton Pattern
   ApiService._internal() {
-    // Call the setup method in the private constructor
     _setupDio();
   }
   static final ApiService _instance = ApiService._internal();
@@ -17,10 +21,10 @@ class ApiService {
   final Dio _dio = Dio();
 
   // 4. A private variable to hold the token
-  // String? _token;
+  // String? _token = await _authService.getToken(); // <-- FIX: DELETE THIS LINE
 
   // 5. Public method to update the token (your Auth code will call this)
-  // void updateAuthToken(String? token) {
+  // void updateAuthToken(String? token) { // <-- FIX: DELETE THIS (not needed)
   //   _token = token;
   // }
 
@@ -34,12 +38,17 @@ class ApiService {
     // 7. Add the Interceptor
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        // <-- FIX: Make this function 'async'
+        onRequest: (options, handler) async {
+
+          // <-- FIX: Get the token fresh *inside* the interceptor
+          String? token = await _authService.getToken();
+
           // This function runs BEFORE every request is sent
-          // if (_token != null) {
-          //   // If we have a token, add the Authorization header
-          //   options.headers['Authorization'] = 'Bearer $_token';
-          // }
+          if (token != null) { // <-- FIX: Use the 'token' variable
+            // If we have a token, add the Authorization header
+            options.headers['Authorization'] = 'Bearer $token';
+          }
           print('REQUEST[${options.method}] => PATH: ${options.path}');
           return handler.next(options); // Continue
         },

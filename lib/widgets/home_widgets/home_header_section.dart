@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/controller/home_controller.dart';
+import 'package:form_flow/screens/home/home_controller.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
@@ -22,7 +22,7 @@ class HomeHeaderSection extends StatelessWidget {
   });
 
   Widget build(BuildContext context) {
-    // Find the controller if you need it here
+    // Find the controllers if you need it here
     final HomeController controller = Get.find();
     return Container(
       decoration: const BoxDecoration(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:form_flow/core/binding/app_binding.dart';
+import 'package:form_flow/core/bindings/app_binding.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:form_flow/routing.dart';
 import 'package:get/get.dart';
@@ -13,11 +13,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       initialBinding: AppBinding(),
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.splash,
       getPages: MyRouting.routes,
       title: 'Supply Chain Manager',
       theme: ThemeData(

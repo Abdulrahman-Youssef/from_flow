@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:form_flow/core/data/constant/data_lists.dart';
 import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
 import 'package:form_flow/models/trip_data.dart';
-import 'package:form_flow/screens/dashboard_widgets/dialog/dropdown_search/dropdown_search2.dart';
+import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
+import 'dashboard_widgets/dialog/dropdown_search/dropdown_search2.dart';
 
 enum DialogMode { add, edit }
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
+import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:form_flow/models/shipment_model.dart';
 import 'package:intl/intl.dart';
-import '../core/data/constant/Deliveries.dart';
+import '../../core/data/constant/Deliveries.dart';
 
 class HomeController extends GetxController {
   // Observable variables
@@ -71,7 +71,7 @@ class HomeController extends GetxController {
     deliveries.add(delivery);
   }
 
-  void removeDelivery(String deliveryID) {
+  void removeDelivery(int deliveryID) {
     deliveries.removeWhere((delivery) => delivery.id == deliveryID);
   }
 

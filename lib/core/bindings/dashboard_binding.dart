@@ -1,7 +1,5 @@
-import 'package:form_flow/controller/dashboard_controller.dart';
 import 'package:form_flow/models/shipment_model.dart';
-import 'package:form_flow/repositories/auth_repository.dart';
-import 'package:form_flow/service/api_service.dart';
+import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
 
 class DashboardBinding extends Bindings {
@@ -14,7 +12,7 @@ class DashboardBinding extends Bindings {
     final SupplyDeliveryData? data = args['data'];
     final DashboardControllerMode mode = args['mode'];
 
-    // 3. Create and register your controller with the dynamic data
+    // 3. Create and register your controllers with the dynamic data
     Get.put<DashboardController>(
       DashboardController(delivery: data, mode: mode),
     );

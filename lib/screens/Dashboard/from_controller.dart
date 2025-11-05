@@ -13,7 +13,7 @@ class FormController extends GetxController {
   DateTime? _fromDate;
   DateTime? _toDate;
 
-  // Notes controller
+  // Notes controllers
   final TextEditingController _notesController = TextEditingController();
 
   // Sample dropdown options

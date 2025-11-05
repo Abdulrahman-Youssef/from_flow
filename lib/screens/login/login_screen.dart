@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/controller/login_controller.dart';
+import 'package:form_flow/screens/login/login_controller.dart';
 import 'package:get/get.dart';
 
 // Now a stateless GetView!
 class LoginScreen extends GetView<LoginScreenController> {
-  // Initialize the controller.
+  // Initialize the controllers.
   // This will be kept in memory by GetX.
   @override
-  final controller = Get.put(LoginScreenController());
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 Widget buildDeliveryCard({
   required SupplyDeliveryData delivery,
   required void Function(SupplyDeliveryData) onDeliveryTap,
-  required void Function(String id) onDeleteTap, // Added delete callback
+  required void Function(int id) onDeleteTap, // Added delete callback
 }) {
   return Card(
     elevation: 2,
@@ -62,7 +62,7 @@ Widget buildDeliveryCard({
                     iconSize: 18,
                     splashRadius: 20,
                     icon: Icon(Icons.delete_outline, color: Colors.red.shade700),
-                    onPressed: () => onDeleteTap(delivery.id.toString()),
+                    onPressed: () => onDeleteTap(delivery.id),
                   ),
                 ),
                 // **** END: DELETE BUTTON ADDED ****

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/controller/home_controller.dart';
+import 'package:form_flow/screens/home/home_controller.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:form_flow/repositories/auth_repository.dart';
 import 'package:get/get.dart';
@@ -25,12 +25,14 @@ class LoginScreenController extends GetxController {
     if (!formKey.currentState!.validate()) {
       return; // If form is invalid, stop here
     }
+  print("where am i 1");
 
     // 4. USE TRY/CATCH/FINALLY
     try {
       // 5. SET LOADING STATE
       isLoading.value = true;
       errorMessage.value = ''; // Clear any previous errors
+      print("where am i 2");
 
       // 6. AWAIT THE LOGIN
       // This will 'pause' the function until the API call is done
@@ -38,7 +40,7 @@ class LoginScreenController extends GetxController {
         usernameController.text,
         passwordController.text,
       );
-
+      print("where am i 3");
       // 7. HANDLE SUCCESS
       // This code only runs if the 'await' line does NOT throw an error
       Get.lazyPut<HomeController>(() => HomeController());

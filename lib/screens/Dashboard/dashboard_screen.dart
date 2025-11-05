@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/controller/dashboard_controller.dart';
+import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
-import '../widgets/data_table_widget.dart';
+import '../../widgets/data_table_widget.dart';
 
 class DashboardScreen extends GetView<DashboardController> {
   const DashboardScreen({super.key});

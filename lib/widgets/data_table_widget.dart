@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/models/trip_data.dart';
-import 'package:form_flow/screens/dashboard_widgets/dashboard_build_expanded_details.dart';
-import 'package:form_flow/screens/dashboard_widgets/dashboard_build_responsive_header.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+
+import 'dashboard_widgets/dashboard_build_expanded_details.dart';
+import 'dashboard_widgets/dashboard_build_responsive_header.dart';
 
 class DataTableWidget extends StatefulWidget {
   final List<TripData> data;

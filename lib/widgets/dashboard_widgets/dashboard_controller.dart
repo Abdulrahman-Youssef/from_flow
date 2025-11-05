@@ -40,7 +40,7 @@ class DashboardController extends GetxController {
 
   // 3. Add this new method to show the edit dialog
   void showEditNameDialog() {
-    // A controller to manage the text field's state
+    // A controllers to manage the text field's state
     final textController = TextEditingController(text: deliveryName.value);
 
     Get.defaultDialog(
@@ -92,7 +92,7 @@ class DashboardController extends GetxController {
     );
   }
 
-  // ... (the rest of your controller code remains the same)
+  // ... (the rest of your controllers code remains the same)
   void showDeleteDialog(TripData record) {
     Get.defaultDialog(
       title: 'Delete Record',

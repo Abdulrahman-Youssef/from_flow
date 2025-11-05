@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:form_flow/service/AuthenticationService.dart';
+import 'package:form_flow/core/data/constant/services_routes.dart';
+import 'package:form_flow/service/auth_service.dart';
 import 'package:form_flow/service/api_service.dart';
 
 
-class AuthRepository {
+class AuthRepository   {
   // Get the singleton instances of the services
   final ApiService _apiService = ApiService();
   final AuthService _authService = AuthService();
@@ -17,14 +18,14 @@ class AuthRepository {
     };
 
     try {
-      final response = await _apiService.post('/login', data: body);
+      final response = await _apiService.post(ServicesRoutes.login, data: body);
 
       if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> responseData = response.data;
 
         // Find the token in the response (adjust 'token' key if yours is different)
-        if (responseData.containsKey('token')) {
-          await _authService.saveToken(responseData['token']);
+        if (responseData.containsKey('access_token')) {
+          await _authService.saveToken(responseData['access_token']);
         }
 
         return responseData; // e.g., {'token': '...', 'user': {...}}
@@ -33,6 +34,31 @@ class AuthRepository {
       }
     } on DioException catch (e) {
       throw _handleDioException(e); // Standardized error
+    } catch (e) {
+      throw 'An unexpected error occurred: $e';
+    }
+  }
+
+
+  /// Fetches the currently authenticated user's data.
+  /// This is the perfect way to validate an existing token.
+  Future<Map<String, dynamic>> getUser() async {
+    try {
+      // 1. Make a GET request to a protected route.
+      // The ApiService interceptor will automatically add the token.
+      // Make sure '/user' matches a real endpoint in your 'routes/api.php'
+      final response = await _apiService.get(ServicesRoutes.user);
+
+      if (response.statusCode == 200 && response.data != null) {
+
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw 'Failed to get user. Invalid server response.';
+      }
+    } on DioException catch (e) {
+      // If the token is expired or invalid, the server will return a 401
+      // and our helper will throw a clean error.
+      throw _handleDioException(e);
     } catch (e) {
       throw 'An unexpected error occurred: $e';
     }
@@ -51,14 +77,14 @@ class AuthRepository {
     };
 
     try {
-      final response = await _apiService.post('/register', data: body);
+      final response = await _apiService.post(ServicesRoutes.register, data: body);
 
       if (response.statusCode == 201 && response.data != null) {
         final Map<String, dynamic> responseData = response.data;
 
         // Save the token on successful registration
-        if (responseData.containsKey('token')) {
-          await _authService.saveToken(responseData['token']);
+        if (responseData.containsKey('access_token')) {
+          await _authService.saveToken(responseData['access_token']);
         }
 
         return responseData;
@@ -77,7 +103,7 @@ class AuthRepository {
   Future<void> logout() async {
     try {
       // 1. Tell the server to invalidate the token (interceptor adds auth)
-      await _apiService.post('/logout');
+      await _apiService.post(ServicesRoutes.logout);
     } catch (e) {
       // We don't care about errors here. If the token is already
       // expired or the server is down, we still need to log out locally.
