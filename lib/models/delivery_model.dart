@@ -9,7 +9,8 @@ class SupplyDeliveryData {
   // --- NEW FIELDS ---
   final String createdBy;
   final String? editedBy;
-  final DateTime? lastEditedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   // ------------------
 
   SupplyDeliveryData({
@@ -20,7 +21,8 @@ class SupplyDeliveryData {
     // Add new fields to the constructor
     required this.createdBy,
     this.editedBy,
-    this.lastEditedAt,
+    this.createdAt,
+    this.updatedAt,
   });
 
   // ✨ ADD THIS METHOD ✨
@@ -33,7 +35,8 @@ class SupplyDeliveryData {
     // Add new fields to copyWith
     String? createdBy,
     String? editedBy,
-    DateTime? lastEditedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return SupplyDeliveryData(
       // Use the new value if provided, otherwise use the old one (`this.name`).
@@ -44,7 +47,8 @@ class SupplyDeliveryData {
       // Pass along the new or old values
       createdBy: createdBy ?? this.createdBy,
       editedBy: editedBy ?? this.editedBy,
-      lastEditedAt: lastEditedAt ?? this.lastEditedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -64,4 +68,38 @@ class SupplyDeliveryData {
       .map((storage) => storage.name)
       .toSet()
       .length;
+
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'date': date.toIso8601String(),
+      'createdBy': createdBy,
+      'editedBy': editedBy,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+      'trips': trips.map((t) => t.toJson()).toList(),
+    };
+  }
+
+  factory SupplyDeliveryData.fromJson(Map<String, dynamic> json) {
+    return SupplyDeliveryData(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      date: DateTime.parse(json['date'] as String),
+      createdBy: json['createdBy'] as String,
+      editedBy: json['editedBy'] as String?,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      trips: (json['trips'] as List<dynamic>)
+          .map((t) => TripData.fromJson(t as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
 }

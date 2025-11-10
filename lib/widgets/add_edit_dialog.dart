@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/core/data/constant/data_lists.dart';
-import 'package:form_flow/models/storage_data.dart';
-import 'package:form_flow/models/supplier_data.dart';
+import 'package:form_flow/controllers/dropdown_data_controller.dart';
+
+// Make sure you import the correct models
+import 'package:form_flow/models/fleet_supervisors_model.dart';
+import 'package:form_flow/models/procurement_specialists_model.dart';
+import 'package:form_flow/models/storage_data.dart'; // <-- CORRECTED
+import 'package:form_flow/models/supplier_data.dart'; // <-- CORRECTED
 import 'package:form_flow/models/trip_data.dart';
+import 'package:form_flow/models/vehicle_model.dart';
 import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -26,60 +31,70 @@ class AddEditDialog extends StatefulWidget {
 }
 
 class _AddEditDialogState extends State<AddEditDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController noteController ;
+  final DropDownDataController controller = Get.find<DropDownDataController>();
 
-  // Section 1: Trip Information
-  String? _vehicleCode;
-  String? _procurementSpecialist;
-  String? _supervisorName;
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController noteController;
+
+  VehicleModel? _selectedVehicle;
+  ProcurementSpecialistsModel? _selectedProcurementSpecialist;
+  FleetSupervisorsModel? _selectedSupervisor;
   String? _note;
 
-  // Section 2: Storage Information
-  List<StorageData> _storages = [StorageData()];
+  // --- CORRECTED MODEL NAMES ---
+  List<StorageModel> _storages = [StorageModel()];
+  List<SupplierModel> _suppliers = [SupplierModel()];
 
-  // Section 3: Suppliers List
-  List<SupplierData> _suppliers = [SupplierData()];
-
-  final List<String> _supplierOptions = DataLists.suppliers;
-  final List<String> _storageOptions = DataLists.warehouses;
-  final List<String> _vehicleNOOptions = DataLists.vehicleCodes;
-  final List<String> _procurementSpecialists = [
-    "John Smith",
-    "Emily Davis",
-    "Robert Wilson",
-    "David Martinez",
-    "Amanda White",
-    "Michael Johnson",
-    "Sarah Brown"
-  ];
-  final List<String> _fleetSupervisors = DataLists.fleetSupervisors;
+  // --- CORRECTED MODEL NAMES ---
+  late final List<SupplierModel> _supplierOptions;
+  late final List<StorageModel> _storageOptions;
+  late final List<VehicleModel> _vehicleNOOptions;
+  late final List<ProcurementSpecialistsModel> _procurementSpecialists;
+  late final List<FleetSupervisorsModel> _fleetSupervisors;
 
   @override
   void initState() {
     super.initState();
-    if (widget.mode == DialogMode.edit && widget.editData != null) {
-      _vehicleCode = widget.editData!.vehicleCode;
-      _procurementSpecialist = widget.editData!.procurementSpecialist;
-      _supervisorName = widget.editData!.fleetSupervisor;
-      _supervisorName = widget.editData!.fleetSupervisor;
-      noteController = TextEditingController(text: widget.editData!.note);
 
-      // Initialize with existing suppliers data
-      _suppliers = widget.editData!.suppliers;
-      // Initialize with existing storages data
-      _storages = widget.editData!.storages;
-    }else {
-       noteController = TextEditingController();
+    // Load all options from the controller
+    // --- CORRECTED LIST NAMES ---
+    _supplierOptions = controller.suppliers;
+    _storageOptions = controller.storages;
+    _vehicleNOOptions = controller.vehicles;
+    _procurementSpecialists = controller.procurementSpecialists;
+    _fleetSupervisors = controller.fleetSupervisors;
+
+    print(_vehicleNOOptions.length);
+
+    if (widget.mode == DialogMode.edit && widget.editData != null) {
+      final data = widget.editData!;
+      noteController = TextEditingController(text: data.note);
+
+      _selectedVehicle = _vehicleNOOptions.firstWhereOrNull(
+        (v) => v.vehicleCode == data.vehicleCode,
+      );
+      _selectedProcurementSpecialist = _procurementSpecialists.firstWhereOrNull(
+        (p) => p.name == data.procurementSpecialist,
+      );
+      _selectedSupervisor = _fleetSupervisors.firstWhereOrNull(
+        (f) => f.name == data.fleetSupervisor,
+      );
+
+      _suppliers = data.suppliers;
+      _storages = data.storages;
+    } else {
+      noteController = TextEditingController();
     }
   }
 
+  // --- CORRECTED MODEL NAME ---
   Future<void> _selectDateTime(
       BuildContext context, int supplierIndex, DateType dateType) async {
     final DateTime now = DateTime.now();
-    final SupplierData supplier = _suppliers[supplierIndex];
+    final SupplierModel supplier = _suppliers[supplierIndex]; // <-- Corrected
 
     DateTime? initialDate;
+    // ... (rest of function is fine)
     switch (dateType) {
       case DateType.planArrive:
         initialDate = supplier.planArriveDate ?? now;
@@ -134,9 +149,10 @@ class _AddEditDialogState extends State<AddEditDialog> {
     }
   }
 
+  // --- CORRECTED MODEL NAME ---
   void _addAnotherSupplier() {
     setState(() {
-      _suppliers.add(SupplierData());
+      _suppliers.add(SupplierModel()); // <-- Corrected
     });
   }
 
@@ -148,9 +164,10 @@ class _AddEditDialogState extends State<AddEditDialog> {
     }
   }
 
+  // --- CORRECTED MODEL NAME ---
   void _addAnotherStorage() {
     setState(() {
-      _storages.add(StorageData());
+      _storages.add(StorageModel()); // <-- Corrected
     });
   }
 
@@ -162,7 +179,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
     }
   }
 
-  bool _validateSupplier(SupplierData supplier, int index) {
+  // --- CORRECTED MODEL NAME ---
+  bool _validateSupplier(SupplierModel supplier, int index) {
+    // <-- Corrected
     if (supplier.supplierName == null) {
       Get.snackbar(
         'Error',
@@ -172,7 +191,7 @@ class _AddEditDialogState extends State<AddEditDialog> {
       );
       return false;
     }
-
+    // ... (rest of validation logic is fine)
     if (supplier.planArriveDate == null) {
       Get.snackbar(
         'Error',
@@ -245,11 +264,12 @@ class _AddEditDialogState extends State<AddEditDialog> {
       );
       return false;
     }
-
     return true;
   }
 
-  bool _validateStorage(StorageData storage, int index) {
+  // --- CORRECTED MODEL NAME ---
+  bool _validateStorage(StorageModel storage, int index) {
+    // <-- Corrected
     if (storage.name == null || storage.name!.isEmpty) {
       Get.snackbar(
         'Error',
@@ -266,11 +286,11 @@ class _AddEditDialogState extends State<AddEditDialog> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+    _note = noteController.text.toString();
 
-    // Validate Section 1 (Vehicle Information)
-    if (_vehicleCode == null ||
-        _procurementSpecialist == null ||
-        _supervisorName == null) {
+    if (_selectedVehicle == null ||
+        _selectedProcurementSpecialist == null ||
+        _selectedSupervisor == null) {
       Get.snackbar(
         'Error',
         'Please fill in all vehicle information fields',
@@ -280,14 +300,12 @@ class _AddEditDialogState extends State<AddEditDialog> {
       return;
     }
 
-    // Validate Section 2 (Storages)
     for (int i = 0; i < _storages.length; i++) {
       if (!_validateStorage(_storages[i], i)) {
         return;
       }
     }
 
-    // Validate Section 3 (Suppliers)
     for (int i = 0; i < _suppliers.length; i++) {
       if (!_validateSupplier(_suppliers[i], i)) {
         return;
@@ -318,11 +336,11 @@ class _AddEditDialogState extends State<AddEditDialog> {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close confirm dialog
+              Navigator.of(context).pop();
               if (isSave) {
                 _performSave();
               }
-              Navigator.of(context).pop(); // Close main dialog
+              Navigator.of(context).pop();
             },
             child: Text('Yes'),
           ),
@@ -335,13 +353,14 @@ class _AddEditDialogState extends State<AddEditDialog> {
     final controller = Get.find<DashboardController>();
 
     final record = TripData(
-        id: widget.editData?.id ?? 0,
-        vehicleCode: _vehicleCode!,
-        procurementSpecialist: _procurementSpecialist!,
-        fleetSupervisor: _supervisorName!,
-        storages: _storages,
-        suppliers: _suppliers,
-        note: _note);
+      id: widget.editData?.id ?? 0,
+      vehicleCode: _selectedVehicle!.vehicleCode,
+      procurementSpecialist: _selectedProcurementSpecialist!.name,
+      fleetSupervisor: _selectedSupervisor!.name,
+      storages: _storages,
+      suppliers: _suppliers,
+      note: _note,
+    );
 
     if (widget.mode == DialogMode.add) {
       controller.addRecord(record);
@@ -379,63 +398,68 @@ class _AddEditDialogState extends State<AddEditDialog> {
           Row(
             children: [
               Expanded(
-                child: ReusableSearchableDropdown(
+                child: ReusableSearchableDropdown<VehicleModel>(
                   items: _vehicleNOOptions,
-                  selectedItem: _vehicleCode,
+                  selectedItem: _selectedVehicle,
                   labelText: "Vehicle Number",
                   hintText: "Select vehicle...",
                   searchHint: "Search vehicle...",
                   prefixIcon: Icon(Icons.local_shipping),
-                  onChanged: (String? value) {
+                  itemAsString: (VehicleModel item) => item.vehicleCode,
+                  // --- FIX: ADDED compareFn ---
+                  compareFn: (item1, item2) => item1 == item2,
+                  onChanged: (VehicleModel? value) {
                     setState(() {
-                      _vehicleCode = value;
+                      _selectedVehicle = value;
                     });
                   },
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Please select a vehicle number'
-                      : null,
+                  validator: (VehicleModel? value) =>
+                      value == null ? 'Please select a vehicle number' : null,
                 ),
               ),
               SizedBox(width: 16),
               Expanded(
-                child: ReusableSearchableDropdown(
+                child: ReusableSearchableDropdown<FleetSupervisorsModel>(
                   items: _fleetSupervisors,
-                  selectedItem: _supervisorName,
+                  selectedItem: _selectedSupervisor,
                   labelText: "Fleet Supervisor",
                   hintText: "Select supervisor...",
                   searchHint: "Search supervisor...",
                   prefixIcon: Icon(Icons.supervised_user_circle),
-                  onChanged: (String? value) {
+                  itemAsString: (FleetSupervisorsModel item) => item.name,
+                  // --- FIX: ADDED compareFn ---
+                  compareFn: (item1, item2) => item1 == item2,
+                  onChanged: (FleetSupervisorsModel? value) {
                     setState(() {
-                      _supervisorName = value;
+                      _selectedSupervisor = value;
                     });
                   },
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Please select a supervisor'
-                      : null,
+                  validator: (FleetSupervisorsModel? value) =>
+                      value == null ? 'Please select a supervisor' : null,
                 ),
               ),
             ],
           ),
           SizedBox(height: 16),
-          ReusableSearchableDropdown(
+          ReusableSearchableDropdown<ProcurementSpecialistsModel>(
             items: _procurementSpecialists,
-            selectedItem: _procurementSpecialist,
+            selectedItem: _selectedProcurementSpecialist,
             labelText: "Procurement Specialist",
             hintText: "Select specialist...",
             searchHint: "Search specialist...",
             prefixIcon: Icon(Icons.person),
-            onChanged: (String? value) {
+            itemAsString: (ProcurementSpecialistsModel item) => item.name,
+            // --- FIX: ADDED compareFn ---
+            compareFn: (item1, item2) => item1 == item2,
+            onChanged: (ProcurementSpecialistsModel? value) {
               setState(() {
-                _procurementSpecialist = value;
+                _selectedProcurementSpecialist = value;
               });
             },
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please select a specialist'
-                : null,
+            validator: (ProcurementSpecialistsModel? value) =>
+                value == null ? 'Please select a specialist' : null,
           ),
           SizedBox(height: 16),
-          // Note
           TextField(
             controller: noteController,
             decoration: InputDecoration(
@@ -444,9 +468,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
               border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
-            onTapOutside: (tap){
+            onTapOutside: (tap) {
               _note = noteController.text.toString();
-              print("tabped out side $_note");
+              print("tapped out side $_note");
             },
             maxLines: null,
             keyboardType: TextInputType.multiline,
@@ -457,8 +481,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
     );
   }
 
+  // --- CORRECTED MODEL NAME ---
   Widget _buildStorageSection(int index) {
-    StorageData storage = _storages[index];
+    StorageModel storage = _storages[index]; // <-- Corrected
 
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -491,21 +516,30 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ],
           ),
           SizedBox(height: 16),
-          ReusableSearchableDropdown(
+          ReusableSearchableDropdown<StorageModel>(
+            // <-- Corrected
             items: _storageOptions,
-            selectedItem: storage.name,
+            selectedItem: storage.name == null ? null : storage,
             labelText: "Storage Name",
             hintText: "Select storage...",
             searchHint: "Search storage...",
             prefixIcon: Icon(Icons.warehouse),
-            onChanged: (String? value) {
-              setState(() {
-                _storages[index] = StorageData(name: value);
-              });
+            itemAsString: (StorageModel item) => item.name ?? '',
+            // <-- Corrected
+            // --- FIX: ADDED compareFn ---
+            compareFn: (item1, item2) => item1 == item2,
+            onChanged: (StorageModel? value) {
+              // <-- Corrected
+              if (value != null) {
+                setState(() {
+                  _storages[index] = value;
+                });
+              }
             },
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please select a storage'
-                : null,
+            validator: (StorageModel? value) => // <-- Corrected
+                value == null || value.name == null
+                    ? 'Please select a storage'
+                    : null,
           ),
         ],
       ),
@@ -543,8 +577,9 @@ class _AddEditDialogState extends State<AddEditDialog> {
     );
   }
 
+  // --- CORRECTED MODEL NAME ---
   Widget _buildSupplierSection(int index) {
-    SupplierData supplier = _suppliers[index];
+    SupplierModel supplier = _suppliers[index]; // <-- Corrected
 
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -577,22 +612,33 @@ class _AddEditDialogState extends State<AddEditDialog> {
             ],
           ),
           SizedBox(height: 16),
-          ReusableSearchableDropdown(
+          ReusableSearchableDropdown<SupplierModel>(
+            // <-- Corrected
             items: _supplierOptions,
-            selectedItem: supplier.supplierName,
+            selectedItem: supplier.supplierName == null ? null : supplier,
             labelText: "Supplier Name",
             hintText: "Select supplier...",
             searchHint: "Search supplier...",
             prefixIcon: Icon(Icons.business),
-            onChanged: (String? value) {
-              setState(() {
-                _suppliers[index] =
-                    _suppliers[index].copyWith(supplierName: value);
-              });
+            itemAsString: (SupplierModel item) => item.supplierName ?? '',
+            // <-- CorrectObserved
+            // --- FIX: ADDED compareFn ---
+            compareFn: (item1, item2) => item1 == item2,
+            onChanged: (SupplierModel? value) {
+              // <-- Corrected
+              if (value != null) {
+                setState(() {
+                  _suppliers[index] = _suppliers[index].copyWith(
+                    id: value.id,
+                    supplierName: value.supplierName,
+                  );
+                });
+              }
             },
-            validator: (value) => value == null || value.isEmpty
-                ? 'Please select a supplier'
-                : null,
+            validator: (SupplierModel? value) => // <-- Corrected
+                value == null || value.supplierName == null
+                    ? 'Please select a supplier'
+                    : null,
           ),
           SizedBox(height: 16),
           InkWell(
@@ -726,13 +772,10 @@ class _AddEditDialogState extends State<AddEditDialog> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Section 1: Vehicle Information
                       _buildTripInformationSection(),
                       SizedBox(height: 24),
-                      // Section 2: Storages
                       _buildStoragesSection(),
                       SizedBox(height: 24),
-                      // Section 3: Suppliers
                       _buildSuppliersSection(),
                     ],
                   ),

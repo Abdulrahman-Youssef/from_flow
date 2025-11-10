@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/models/shipment_model.dart';
+import 'package:form_flow/models/delivery_model.dart';
 import 'package:form_flow/models/trip_data.dart';
 import 'package:form_flow/widgets/add_edit_dialog.dart';
 import 'package:get/get.dart';

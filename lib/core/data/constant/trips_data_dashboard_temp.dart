@@ -8,11 +8,11 @@ class TripsTempData {
     TripData(
         id: 1,
         vehicleCode: "0081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -20,11 +20,11 @@ class TripsTempData {
     TripData(
         id: 2,
         vehicleCode: "2081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -32,11 +32,11 @@ class TripsTempData {
     TripData(
         id: 3,
         vehicleCode: "3081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -44,11 +44,11 @@ class TripsTempData {
     TripData(
         id: 4,
         vehicleCode: "4081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -56,11 +56,11 @@ class TripsTempData {
     TripData(
         id: 5,
         vehicleCode: "5081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -68,11 +68,11 @@ class TripsTempData {
     TripData(
         id: 6,
         vehicleCode: "6081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -80,11 +80,11 @@ class TripsTempData {
     TripData(
         id: 7,
         vehicleCode: "7081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -92,11 +92,11 @@ class TripsTempData {
     TripData(
         id: 8,
         vehicleCode: "8081",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")
@@ -105,17 +105,17 @@ class TripsTempData {
         id: 9,
         vehicleCode: "9081",
         storages: [
-          StorageData(id: 1, name: "MAIN EXP. WAREHOUSE"),
-          StorageData(id: 2, name: "MAIN EXP222. WAREHOUSE")
+          StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE"),
+          StorageModel(id: 2, name: "MAIN EXP222. WAREHOUSE")
         ],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY"),
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA1 PHARMA COMPANY"),
@@ -123,11 +123,11 @@ class TripsTempData {
     TripData(
         id: 10,
         vehicleCode: "90181",
-        storages: [StorageData(id: 1, name: "MAIN EXP. WAREHOUSE")],
+        storages: [StorageModel(id: 1, name: "MAIN EXP. WAREHOUSE")],
         procurementSpecialist: "procurementSpecialist",
         fleetSupervisor: "Ahmed Fouad",
         suppliers: [
-          SupplierData(
+          SupplierModel(
               actualArriveDate: DateTime(2025, 10, 23),
               actualDepartureDate: DateTime(2025, 10, 24),
               supplierName: "HIKMA PHARMA COMPANY")

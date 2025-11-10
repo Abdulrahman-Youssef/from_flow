@@ -1,4 +1,4 @@
-import 'package:form_flow/models/shipment_model.dart';
+import 'package:form_flow/models/delivery_model.dart';
 import 'package:form_flow/models/supplier_data.dart';
 import 'package:form_flow/models/trip_data.dart';
 
@@ -15,7 +15,7 @@ List <SupplyDeliveryData> homeScreenList  = [
             procurementSpecialist: "procurementSpecialist",
             fleetSupervisor: "fa",
             suppliers: [
-              SupplierData(
+              SupplierModel(
                 id: 1,
                 supplierName: "GDA Logistics",
                 // Arrived yesterday in the morning
@@ -26,7 +26,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 9, 14, 0),
                 planArriveDate: DateTime(2025, 10, 9, 10, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 2,
                 supplierName: "Cairo Couriers",
                 // Arrived today in the morning
@@ -37,7 +37,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 12, 45),
                 planArriveDate: DateTime(2025, 10, 10, 9, 15),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 3,
                 supplierName: "Nile Valley Transport",
                 // Arrived this afternoon
@@ -48,7 +48,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 18, 5),
                 planArriveDate: DateTime(2025, 10, 10, 16, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 4,
                 supplierName: "Red Sea Freights",
                 // Arrived two days ago
@@ -73,7 +73,7 @@ List <SupplyDeliveryData> homeScreenList  = [
             procurementSpecialist: "procurementSpecialist",
             fleetSupervisor: "fa",
             suppliers: [
-              SupplierData(
+              SupplierModel(
                 id: 1,
                 supplierName: "GDA Logistics",
                 // Arrived yesterday in the morning
@@ -84,7 +84,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 9, 14, 0),
                 planArriveDate: DateTime(2025, 10, 9, 10, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 2,
                 supplierName: "Cairo Couriers",
                 // Arrived today in the morning
@@ -95,7 +95,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 12, 45),
                 planArriveDate: DateTime(2025, 10, 10, 9, 15),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 3,
                 supplierName: "Nile Valley Transport",
                 // Arrived this afternoon
@@ -106,7 +106,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 18, 5),
                 planArriveDate: DateTime(2025, 10, 10, 16, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 4,
                 supplierName: "Red Sea Freights",
                 // Arrived two days ago
@@ -131,7 +131,7 @@ List <SupplyDeliveryData> homeScreenList  = [
             procurementSpecialist: "procurementSpecialist",
             fleetSupervisor: "fa",
             suppliers: [
-              SupplierData(
+              SupplierModel(
                 id: 1,
                 supplierName: "GDA Logistics",
                 // Arrived yesterday in the morning
@@ -142,7 +142,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 9, 14, 0),
                 planArriveDate: DateTime(2025, 10, 9, 10, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 2,
                 supplierName: "Cairo Couriers",
                 // Arrived today in the morning
@@ -153,7 +153,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 12, 45),
                 planArriveDate: DateTime(2025, 10, 10, 9, 15),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 3,
                 supplierName: "Nile Valley Transport",
                 // Arrived this afternoon
@@ -164,7 +164,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 18, 5),
                 planArriveDate: DateTime(2025, 10, 10, 16, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 4,
                 supplierName: "Red Sea Freights",
                 // Arrived two days ago
@@ -189,7 +189,7 @@ List <SupplyDeliveryData> homeScreenList  = [
             procurementSpecialist: "procurementSpecialist",
             fleetSupervisor: "fa",
             suppliers: [
-              SupplierData(
+              SupplierModel(
                 id: 1,
                 supplierName: "GDA Logistics",
                 // Arrived yesterday in the morning
@@ -200,7 +200,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 9, 14, 0),
                 planArriveDate: DateTime(2025, 10, 9, 10, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 2,
                 supplierName: "Cairo Couriers",
                 // Arrived today in the morning
@@ -211,7 +211,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 12, 45),
                 planArriveDate: DateTime(2025, 10, 10, 9, 15),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 3,
                 supplierName: "Nile Valley Transport",
                 // Arrived this afternoon
@@ -222,7 +222,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 18, 5),
                 planArriveDate: DateTime(2025, 10, 10, 16, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 4,
                 supplierName: "Red Sea Freights",
                 // Arrived two days ago
@@ -247,7 +247,7 @@ List <SupplyDeliveryData> homeScreenList  = [
             procurementSpecialist: "procurementSpecialist",
             fleetSupervisor: "fa",
             suppliers: [
-              SupplierData(
+              SupplierModel(
                 id: 1,
                 supplierName: "GDA Logistics",
                 // Arrived yesterday in the morning
@@ -258,7 +258,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 9, 14, 0),
                 planArriveDate: DateTime(2025, 10, 9, 10, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 2,
                 supplierName: "Cairo Couriers",
                 // Arrived today in the morning
@@ -269,7 +269,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 12, 45),
                 planArriveDate: DateTime(2025, 10, 10, 9, 15),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 3,
                 supplierName: "Nile Valley Transport",
                 // Arrived this afternoon
@@ -280,7 +280,7 @@ List <SupplyDeliveryData> homeScreenList  = [
                 DateTime(2025, 10, 10, 18, 5),
                 planArriveDate: DateTime(2025, 10, 10, 16, 0),
               ),
-              SupplierData(
+              SupplierModel(
                 id: 4,
                 supplierName: "Red Sea Freights",
                 // Arrived two days ago

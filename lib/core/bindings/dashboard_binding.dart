@@ -1,4 +1,4 @@
-import 'package:form_flow/models/shipment_model.dart';
+import 'package:form_flow/models/delivery_model.dart';
 import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
 

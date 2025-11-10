@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
-import 'package:form_flow/models/shipment_model.dart';
+import 'package:form_flow/models/delivery_model.dart';
 import 'package:intl/intl.dart';
 import '../../core/data/constant/Deliveries.dart';
 

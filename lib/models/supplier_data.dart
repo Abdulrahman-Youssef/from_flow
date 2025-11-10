@@ -1,11 +1,11 @@
-class SupplierData {
+class SupplierModel {
   final int? id;
   String? supplierName;
   DateTime? actualArriveDate;
   DateTime? actualDepartureDate;
   DateTime? planArriveDate;
 
-  SupplierData({
+  SupplierModel({
     this.id,
     this.supplierName,
     this.actualArriveDate,
@@ -13,14 +13,14 @@ class SupplierData {
     this.planArriveDate,
   });
 
-  SupplierData copyWith({
+  SupplierModel copyWith({
     int? id,
     String? supplierName,
     DateTime? actualArriveDate,
     DateTime? actualDepartureDate,
     DateTime? planArriveDate,
   }) {
-    return SupplierData(
+    return SupplierModel(
       id: id ?? this.id,
       supplierName: supplierName ?? this.supplierName,
       actualArriveDate: actualArriveDate ?? this.actualArriveDate,
@@ -36,4 +36,32 @@ class SupplierData {
 
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'supplierName': supplierName,
+      'actualArriveDate': actualArriveDate?.toIso8601String(),
+      'actualDepartureDate': actualDepartureDate?.toIso8601String(),
+      'planArriveDate': planArriveDate?.toIso8601String(),
+    };
+  }
+
+  factory SupplierModel.fromJson(Map<String, dynamic> json) {
+    return SupplierModel(
+      id: json['id'] as int?,
+      supplierName: json['supplier_name'] as String?,
+      actualArriveDate: json['actualArriveDate'] != null
+          ? DateTime.parse(json['actualArriveDate'] as String)
+          : null,
+      actualDepartureDate: json['actualDepartureDate'] != null
+          ? DateTime.parse(json['actualDepartureDate'] as String)
+          : null,
+      planArriveDate: json['planArriveDate'] != null
+          ? DateTime.parse(json['planArriveDate'] as String)
+          : null,
+    );
+  }
+
+
 }
