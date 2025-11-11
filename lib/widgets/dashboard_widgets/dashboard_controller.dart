@@ -1,7 +1,9 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:form_flow/models/delivery_model.dart';
 import 'package:form_flow/models/trip_data.dart';
-import 'package:form_flow/widgets/add_edit_dialog.dart';
+import 'package:form_flow/widgets/dashboard_widgets/dialog/add_edit_dialog.dart';
+import 'package:form_flow/widgets/dashboard_widgets/dialog/add_edit_dialog_controller.dart';
 import 'package:get/get.dart';
 
 enum DashboardControllerMode {
@@ -75,21 +77,26 @@ class DashboardController extends GetxController {
     selectedDate.value = date;
   }
 
-  void showAddDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AddEditDialog(mode: DialogMode.add),
+  void showAddDialog(BuildContext context)async {
+
+    Get.put(AddEditDialogController(mode: DialogMode.add));
+
+   await  Get.dialog(
+      const AddEditDialog(),
     );
+    Get.delete<AddEditDialogController>();
+
   }
 
-  void showEditDialog(TripData record, BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AddEditDialog(
-        mode: DialogMode.edit,
-        editData: record,
-      ),
+  void showEditDialog(TripData record, BuildContext context)async {
+
+    Get.put(AddEditDialogController(mode: DialogMode.edit));
+
+   await Get.dialog(
+      const AddEditDialog(),
     );
+
+   Get.delete<AddEditDialogController>();
   }
 
   // ... (the rest of your controllers code remains the same)
