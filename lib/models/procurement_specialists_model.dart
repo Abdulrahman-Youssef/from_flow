@@ -50,5 +50,5 @@ class ProcurementSpecialistsModel {
 
   // 6. toString (for easy debugging)
   @override
-  String toString() => 'ProcurementSpecialistsModel(id: $id, name: $name)';
+  String toString() => name;
 }

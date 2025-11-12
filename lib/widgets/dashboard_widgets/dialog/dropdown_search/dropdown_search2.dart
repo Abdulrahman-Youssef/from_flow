@@ -93,6 +93,7 @@ class ReusableSearchableDropdown<T> extends StatelessWidget {
               ),
             ),
             child: Text(
+              // "this is the text",
               itemAsString(item), // <-- CHANGED
               style: TextStyle(
                 color: isDisabled ? Colors.grey : Colors.black,

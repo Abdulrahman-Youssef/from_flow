@@ -33,5 +33,5 @@ class FleetSupervisorsModel {
 
   // 3. toString: For easy debugging
   @override
-  String toString() => 'FleetSupervisorsModel(id: $id, name: $name)';
+  String toString() => name ?? "";
 }

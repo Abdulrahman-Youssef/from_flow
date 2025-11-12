@@ -18,8 +18,15 @@ Widget buildStoragesSection() {
         ),
       ),
       SizedBox(height: 16),
-      ...List.generate(
-          controller.storages.length, (index) => buildStorageSection(index)),
+      Obx(() => Column(
+        // mainAxisSize: MainAxisSize.min, // Prevents layout errors
+        children: [
+          ...List.generate(
+              controller.storages.length, // This is now reactive
+                  (index) => buildStorageSection(index)
+          ),
+        ],
+      )),
       SizedBox(height: 8),
       Center(
         child: OutlinedButton.icon(

@@ -51,5 +51,5 @@ class VehicleModel {
 
   // 6. toString (for debugging)
   @override
-  String toString() => 'VehicleModel(id: $id, vehicleCode: $vehicleCode)';
+  String toString() => vehicleCode;
 }

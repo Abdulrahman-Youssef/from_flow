@@ -25,10 +25,12 @@ class AddEditDialogController extends GetxController {
   late TextEditingController noteController;
 
 // selected data
-  Rxn<VehicleModel> selectedVehicle = Rxn<VehicleModel>();
-  Rxn<ProcurementSpecialistsModel> selectedProcurementSpecialist = Rxn<ProcurementSpecialistsModel>();
-  Rxn<FleetSupervisorsModel> selectedSupervisor = Rxn<FleetSupervisorsModel>();
-  Rxn<String> note = Rxn<String>();
+  final Rxn<VehicleModel> selectedVehicle = Rxn<VehicleModel>();
+  final Rxn<ProcurementSpecialistsModel> selectedProcurementSpecialist =
+      Rxn<ProcurementSpecialistsModel>();
+  final Rxn<FleetSupervisorsModel> selectedSupervisor =
+      Rxn<FleetSupervisorsModel>();
+  final Rxn<String> note = Rxn<String>();
 
   // --- CORRECTED MODEL NAMES ---
   List<StorageModel> storages = [StorageModel()].obs;
@@ -60,7 +62,8 @@ class AddEditDialogController extends GetxController {
       selectedVehicle.value = vehicleNOOptions.firstWhereOrNull(
         (v) => v.vehicleCode == data.vehicleCode,
       );
-      selectedProcurementSpecialist.value = procurementSpecialists.firstWhereOrNull(
+      selectedProcurementSpecialist.value =
+          procurementSpecialists.firstWhereOrNull(
         (p) => p.name == data.procurementSpecialist,
       );
       selectedSupervisor.value = fleetSupervisors.firstWhereOrNull(
@@ -136,22 +139,23 @@ class AddEditDialogController extends GetxController {
   // --- CORRECTED MODEL NAME ---
   void addAnotherSupplier() {
     suppliers.add(SupplierModel()); // <-- Corrected
+    update();
   }
 
   void removeSupplier(int index) {
     if (suppliers.length > 1) {
-        suppliers.removeAt(index);
+      suppliers.removeAt(index);
     }
   }
 
   // --- CORRECTED MODEL NAME ---
   void addAnotherStorage() {
-      storages.add(StorageModel()); // <-- Corrected
+    storages.add(StorageModel()); // <-- Corrected
   }
 
   void removeStorage(int index) {
     if (storages.length > 1) {
-        storages.removeAt(index);
+      storages.removeAt(index);
     }
   }
 
@@ -265,8 +269,8 @@ class AddEditDialogController extends GetxController {
     note.value = noteController.text.toString();
 
     if (selectedVehicle.value == null ||
-        selectedProcurementSpecialist.value  == null ||
-        selectedSupervisor.value  == null) {
+        selectedProcurementSpecialist.value == null ||
+        selectedSupervisor.value == null) {
       Get.snackbar(
         'Error',
         'Please fill in all vehicle information fields',
@@ -288,14 +292,14 @@ class AddEditDialogController extends GetxController {
       }
     }
 
-    _showConfirmDialog(true,context);
+    _showConfirmDialog(true, context);
   }
 
   void handleCancel(BuildContext context) {
-    _showConfirmDialog(false , context );
+    _showConfirmDialog(false, context);
   }
 
-  void _showConfirmDialog(bool isSave , BuildContext context) {
+  void _showConfirmDialog(bool isSave, BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

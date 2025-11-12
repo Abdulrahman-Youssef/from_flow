@@ -64,7 +64,7 @@ class StorageModel {
   }
 
   @override
-  String toString() => 'StorageData(id: $id, name: $name)';
+  String toString() => '$name';
 
   // Validation method
   bool isValid() => id! > 0 && name!.isNotEmpty;

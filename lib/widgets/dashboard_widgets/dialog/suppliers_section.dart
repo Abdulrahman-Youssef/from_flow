@@ -18,8 +18,15 @@ Widget buildSuppliersSection() {
         ),
       ),
       SizedBox(height: 16),
-      ...List.generate(controller.suppliers.length,
-              (index) => buildSupplierSection(index)),
+      Obx(() => Column(
+        mainAxisSize: MainAxisSize.min, // Prevents layout errors
+        children: [
+          ...List.generate(
+              controller.suppliers.length, // This is now reactive
+                  (index) => buildSupplierSection(index)
+          ),
+        ],
+      )),
       SizedBox(height: 8),
       Center(
         child: OutlinedButton.icon(

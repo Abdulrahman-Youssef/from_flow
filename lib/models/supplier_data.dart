@@ -29,6 +29,11 @@ class SupplierModel {
     );
   }
 
+ @override
+  String toString() => '$supplierName';
+
+
+
   String get waitingTime {
     final difference = actualDepartureDate!.difference(actualArriveDate!);
     final hours = difference.inHours;
