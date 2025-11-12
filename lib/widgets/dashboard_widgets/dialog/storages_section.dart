@@ -22,7 +22,7 @@ Widget buildStoragesSection() {
         // mainAxisSize: MainAxisSize.min, // Prevents layout errors
         children: [
           ...List.generate(
-              controller.storages.length, // This is now reactive
+              controller.selectedStorages.length, // This is now reactive
                   (index) => buildStorageSection(index)
           ),
         ],

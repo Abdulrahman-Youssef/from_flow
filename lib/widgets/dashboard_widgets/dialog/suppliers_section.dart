@@ -22,7 +22,7 @@ Widget buildSuppliersSection() {
         mainAxisSize: MainAxisSize.min, // Prevents layout errors
         children: [
           ...List.generate(
-              controller.suppliers.length, // This is now reactive
+              controller.selectedSuppliers.length, // This is now reactive
                   (index) => buildSupplierSection(index)
           ),
         ],

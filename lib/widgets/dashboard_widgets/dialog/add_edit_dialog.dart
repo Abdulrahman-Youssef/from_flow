@@ -66,7 +66,7 @@ class AddEditDialog extends GetView<AddEditDialogController> {
                 ),
                 SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: () => controller.handleSave,
+                  onPressed: () => controller.handleSave(context),
                   child: Text('Save'),
                 ),
               ],

@@ -30,7 +30,7 @@ Widget buildTripInformationSection() {
         Row(
           children: [
             Expanded(
-              child: ReusableSearchableDropdown<VehicleModel>(
+              child: Obx( ()=>ReusableSearchableDropdown<VehicleModel>(
                 items: controller.vehicleNOOptions,
                 selectedItem: controller.selectedVehicle.value,
                 labelText: "Vehicle Number",
@@ -46,9 +46,9 @@ Widget buildTripInformationSection() {
                 validator: (VehicleModel? value) =>
                 value == null ? 'Please select a vehicle number' : null,
               ),
-            ),
+            )),
             SizedBox(width: 16),
-            Expanded(
+            Obx( ()=> Expanded(
               child: ReusableSearchableDropdown<FleetSupervisorsModel>(
                 items: controller.fleetSupervisors,
                 selectedItem: controller.selectedSupervisor.value,
@@ -65,11 +65,11 @@ Widget buildTripInformationSection() {
                 validator: (FleetSupervisorsModel? value) =>
                 value == null ? 'Please select a supervisor' : null,
               ),
-            ),
+            )),
           ],
         ),
         SizedBox(height: 16),
-        ReusableSearchableDropdown<ProcurementSpecialistsModel>(
+    Obx( ()=> ReusableSearchableDropdown<ProcurementSpecialistsModel>(
           items: controller.procurementSpecialists,
           selectedItem: controller.selectedProcurementSpecialist.value,
           labelText: "Procurement Specialist",
@@ -84,7 +84,7 @@ Widget buildTripInformationSection() {
           },
           validator: (ProcurementSpecialistsModel? value) =>
           value == null ? 'Please select a specialist' : null,
-        ),
+        )),
         SizedBox(height: 16),
         TextField(
           controller: controller.noteController,

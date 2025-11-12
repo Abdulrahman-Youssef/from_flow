@@ -7,7 +7,7 @@ import 'dropdown_search/dropdown_search2.dart';
 Widget buildStorageSection(int index) {
   final controller = Get.find<AddEditDialogController>();
 
-  StorageModel storage = controller.storages[index]; // <-- Corrected
+  // StorageModel storage = controller.selectedStorages[index]; // <-- Corrected
 
   return Container(
     margin: EdgeInsets.only(bottom: 16),
@@ -30,7 +30,7 @@ Widget buildStorageSection(int index) {
                 color: Colors.purple.shade700,
               ),
             ),
-            if (controller.storages.length > 1)
+            if (controller.selectedStorages.length > 1)
               IconButton(
                 onPressed: () => controller.removeStorage(index),
                 icon: Icon(Icons.delete, color: Colors.red),
@@ -40,10 +40,10 @@ Widget buildStorageSection(int index) {
           ],
         ),
         SizedBox(height: 16),
-        ReusableSearchableDropdown<StorageModel>(
+        Obx( ()=> ReusableSearchableDropdown<StorageModel>(
           // <-- Corrected
           items: controller.storageOptions,
-          selectedItem: storage.name == null ? null : storage,
+          selectedItem: controller.selectedStorages[index].name == null ? null : controller.selectedStorages[index],
           labelText: "Storage Name",
           hintText: "Select storage...",
           searchHint: "Search storage...",
@@ -55,14 +55,14 @@ Widget buildStorageSection(int index) {
           onChanged: (StorageModel? value) {
             // <-- Corrected
             if (value != null) {
-              controller.storages[index] = value;
+              controller.selectedStorages[index] = value;
             }
           },
           validator: (StorageModel? value) => // <-- Corrected
           value == null || value.name == null
               ? 'Please select a storage'
               : null,
-        ),
+        )),
       ],
     ),
   );

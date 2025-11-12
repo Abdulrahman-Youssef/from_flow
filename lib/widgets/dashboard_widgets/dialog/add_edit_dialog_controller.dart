@@ -33,8 +33,8 @@ class AddEditDialogController extends GetxController {
   final Rxn<String> note = Rxn<String>();
 
   // --- CORRECTED MODEL NAMES ---
-  List<StorageModel> storages = [StorageModel()].obs;
-  List<SupplierModel> suppliers = [SupplierModel()].obs;
+  final selectedStorages = <StorageModel>[].obs;
+  final selectedSuppliers = <SupplierModel>[].obs;
 
   // --- CORRECTED MODEL NAMES ---
   late final List<SupplierModel> supplierOptions;
@@ -70,8 +70,8 @@ class AddEditDialogController extends GetxController {
         (f) => f.name == data.fleetSupervisor,
       );
 
-      suppliers = data.suppliers;
-      storages = data.storages;
+      selectedSuppliers.value = data.suppliers;
+      selectedStorages.value = data.storages;
     } else {
       noteController = TextEditingController();
     }
@@ -79,7 +79,7 @@ class AddEditDialogController extends GetxController {
 
   Future<void> selectDateTime(int supplierIndex, DateType dateType) async {
     final DateTime now = DateTime.now();
-    final SupplierModel supplier = suppliers[supplierIndex]; // <-- Corrected
+    final SupplierModel supplier = selectedSuppliers[supplierIndex]; // <-- Corrected
 
     DateTime? initialDate;
     // ... (rest of function is fine)
@@ -119,15 +119,15 @@ class AddEditDialogController extends GetxController {
 
         switch (dateType) {
           case DateType.planArrive:
-            suppliers[supplierIndex] = suppliers[supplierIndex]
+            selectedSuppliers[supplierIndex] = selectedSuppliers[supplierIndex]
                 .copyWith(planArriveDate: selectedDateTime);
             break;
           case DateType.actualArrive:
-            suppliers[supplierIndex] = suppliers[supplierIndex]
+            selectedSuppliers[supplierIndex] = selectedSuppliers[supplierIndex]
                 .copyWith(actualArriveDate: selectedDateTime);
             break;
           case DateType.actualDeparture:
-            suppliers[supplierIndex] = suppliers[supplierIndex]
+            selectedSuppliers[supplierIndex] = selectedSuppliers[supplierIndex]
                 .copyWith(actualDepartureDate: selectedDateTime);
             break;
         }
@@ -138,24 +138,24 @@ class AddEditDialogController extends GetxController {
 
   // --- CORRECTED MODEL NAME ---
   void addAnotherSupplier() {
-    suppliers.add(SupplierModel()); // <-- Corrected
+    selectedSuppliers.add(SupplierModel()); // <-- Corrected
     update();
   }
 
   void removeSupplier(int index) {
-    if (suppliers.length > 1) {
-      suppliers.removeAt(index);
+    if (selectedSuppliers.length > 1) {
+      selectedSuppliers.removeAt(index);
     }
   }
 
   // --- CORRECTED MODEL NAME ---
   void addAnotherStorage() {
-    storages.add(StorageModel()); // <-- Corrected
+    selectedStorages.add(StorageModel()); // <-- Corrected
   }
 
   void removeStorage(int index) {
-    if (storages.length > 1) {
-      storages.removeAt(index);
+    if (selectedStorages.length > 1) {
+      selectedStorages.removeAt(index);
     }
   }
 
@@ -169,6 +169,7 @@ class AddEditDialogController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+      update();
       return false;
     }
     // ... (rest of validation logic is fine)
@@ -263,9 +264,14 @@ class AddEditDialogController extends GetxController {
   }
 
   void handleSave(BuildContext context) {
+    print("im  working 1");
     if (!formKey.currentState!.validate()) {
+      print("im not working 1");
       return;
     }
+
+    print("im  working 2");
+
     note.value = noteController.text.toString();
 
     if (selectedVehicle.value == null ||
@@ -280,14 +286,14 @@ class AddEditDialogController extends GetxController {
       return;
     }
 
-    for (int i = 0; i < storages.length; i++) {
-      if (!_validateStorage(storages[i], i)) {
+    for (int i = 0; i < selectedStorages.length; i++) {
+      if (!_validateStorage(selectedStorages[i], i)) {
         return;
       }
     }
 
-    for (int i = 0; i < suppliers.length; i++) {
-      if (!_validateSupplier(suppliers[i], i)) {
+    for (int i = 0; i < selectedSuppliers.length; i++) {
+      if (!_validateSupplier(selectedSuppliers[i], i)) {
         return;
       }
     }
@@ -307,7 +313,7 @@ class AddEditDialogController extends GetxController {
             ? 'Are you sure you want to save?'
             : 'Are you sure you want to cancel?'),
         content: Text(isSave
-            ? 'This will save the current data with ${storages.length} storage(s) and ${suppliers.length} supplier(s) to the temp_table.'
+            ? 'This will save the current data with ${selectedStorages.length} storage(s) and ${selectedSuppliers.length} supplier(s) to the temp_table.'
             : 'Any unsaved changes will be lost.'),
         actions: [
           TextButton(
@@ -337,8 +343,8 @@ class AddEditDialogController extends GetxController {
       vehicleCode: selectedVehicle.value!.vehicleCode,
       procurementSpecialist: selectedProcurementSpecialist.value!.name,
       fleetSupervisor: selectedSupervisor.value!.name,
-      storages: storages,
-      suppliers: suppliers,
+      storages: selectedStorages,
+      suppliers: selectedSuppliers,
       note: note.value,
     );
 
@@ -350,7 +356,7 @@ class AddEditDialogController extends GetxController {
 
     Get.snackbar(
       'Success',
-      'Record ${mode == DialogMode.add ? 'added' : 'updated'} successfully with ${storages.length} storage(s) and ${suppliers.length} supplier(s)',
+      'Record ${mode == DialogMode.add ? 'added' : 'updated'} successfully with ${selectedStorages.length} storage(s) and ${selectedSuppliers.length} supplier(s)',
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );
