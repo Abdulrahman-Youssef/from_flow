@@ -22,21 +22,24 @@ class AddEditDialogController extends GetxController {
   AddEditDialogController({required this.mode, this.editData});
 
   final formKey = GlobalKey<FormState>();
-  late TextEditingController noteController;
+  late final TextEditingController noteController;
 
-// selected data
+  // ---  SELECTED NAMES ---
   final Rxn<VehicleModel> selectedVehicle = Rxn<VehicleModel>();
+
   final Rxn<ProcurementSpecialistsModel> selectedProcurementSpecialist =
       Rxn<ProcurementSpecialistsModel>();
+
   final Rxn<FleetSupervisorsModel> selectedSupervisor =
       Rxn<FleetSupervisorsModel>();
+
   final Rxn<String> note = Rxn<String>();
 
-  // --- CORRECTED MODEL NAMES ---
   final selectedStorages = <StorageModel>[].obs;
+
   final selectedSuppliers = <SupplierModel>[].obs;
 
-  // --- CORRECTED MODEL NAMES ---
+  // ---  MODEL NAMES ---
   late final List<SupplierModel> supplierOptions;
   late final List<StorageModel> storageOptions;
   late final List<VehicleModel> vehicleNOOptions;
@@ -48,7 +51,6 @@ class AddEditDialogController extends GetxController {
     super.onInit();
 
     // Load all options from the controller
-    // --- CORRECTED LIST NAMES ---
     supplierOptions = controller.suppliers;
     storageOptions = controller.storages;
     vehicleNOOptions = controller.vehicles;
@@ -77,9 +79,19 @@ class AddEditDialogController extends GetxController {
     }
   }
 
+  //gets
+
+  String get dialogTitle =>
+      mode == DialogMode.add ? "Add New Record" : 'Edit Record';
+
+  String get dialogSupTitle => mode == DialogMode.add
+      ? 'Fill in vehicle information, add storages, and add one or more suppliers.'
+      : 'Update the fields below to modify the existing record.';
+
   Future<void> selectDateTime(int supplierIndex, DateType dateType) async {
     final DateTime now = DateTime.now();
-    final SupplierModel supplier = selectedSuppliers[supplierIndex]; // <-- Corrected
+    final SupplierModel supplier =
+        selectedSuppliers[supplierIndex]; // <-- Corrected
 
     DateTime? initialDate;
     // ... (rest of function is fine)
@@ -143,7 +155,7 @@ class AddEditDialogController extends GetxController {
   }
 
   void removeSupplier(int index) {
-    if (selectedSuppliers.length > 1) {
+    if (selectedSuppliers.isNotEmpty) {
       selectedSuppliers.removeAt(index);
     }
   }
@@ -154,7 +166,7 @@ class AddEditDialogController extends GetxController {
   }
 
   void removeStorage(int index) {
-    if (selectedStorages.length > 1) {
+    if (selectedStorages.isNotEmpty) {
       selectedStorages.removeAt(index);
     }
   }
@@ -264,14 +276,9 @@ class AddEditDialogController extends GetxController {
   }
 
   void handleSave(BuildContext context) {
-    print("im  working 1");
     if (!formKey.currentState!.validate()) {
-      print("im not working 1");
       return;
     }
-
-    print("im  working 2");
-
     note.value = noteController.text.toString();
 
     if (selectedVehicle.value == null ||

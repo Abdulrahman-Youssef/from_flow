@@ -34,7 +34,7 @@ Widget buildSupplierSection(int index) {
                       color: Colors.green.shade700,
                     ),
                   ),
-                  if (controller.selectedSuppliers.length > 1)
+                  if (controller.selectedSuppliers.isNotEmpty)
                     IconButton(
                       onPressed: () => controller.removeSupplier(index),
                       icon: Icon(Icons.delete, color: Colors.red),

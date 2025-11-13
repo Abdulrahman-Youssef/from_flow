@@ -90,7 +90,7 @@ class DashboardController extends GetxController {
 
   void showEditDialog(TripData record, BuildContext context)async {
 
-    Get.put(AddEditDialogController(mode: DialogMode.edit));
+    Get.put(AddEditDialogController(mode: DialogMode.edit ,editData: record ));
 
    await Get.dialog(
       const AddEditDialog(),

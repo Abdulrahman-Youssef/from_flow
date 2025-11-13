@@ -30,7 +30,7 @@ Widget buildStorageSection(int index) {
                 color: Colors.purple.shade700,
               ),
             ),
-            if (controller.selectedStorages.length > 1)
+            if (controller.selectedStorages.isNotEmpty)
               IconButton(
                 onPressed: () => controller.removeStorage(index),
                 icon: Icon(Icons.delete, color: Colors.red),
