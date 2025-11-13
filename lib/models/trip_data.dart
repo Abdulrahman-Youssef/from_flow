@@ -6,7 +6,7 @@ class TripData {
   final String vehicleCode;
   final String procurementSpecialist;
   final String fleetSupervisor;
-  final List<SupplierModel> suppliers;
+  final List<SupplierModel> suppliers ;
   final List<StorageModel> storages;
   final String? note;
 

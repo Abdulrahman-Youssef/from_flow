@@ -174,6 +174,7 @@ class AddEditDialogController extends GetxController {
   // --- CORRECTED MODEL NAME ---
   bool _validateSupplier(SupplierModel supplier, int index) {
     // <-- Corrected
+
     if (supplier.supplierName == null) {
       Get.snackbar(
         'Error',
@@ -297,6 +298,17 @@ class AddEditDialogController extends GetxController {
       if (!_validateStorage(selectedStorages[i], i)) {
         return;
       }
+    }
+
+    if(selectedStorages.isNotEmpty){
+      Get.snackbar(
+        'Error',
+        'Please added at least one supplier',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      update();
+      return ;
     }
 
     for (int i = 0; i < selectedSuppliers.length; i++) {

@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 
 class HomeScreen extends GetView<HomeController> {
   // will be moved to controllers until that happened it will stay here
-  final Function(SupplyDeliveryData) onDeliveryTap;
+  final Function(DeliveryData) onDeliveryTap;
   final VoidCallback onAddNewDelivery;
 
   const HomeScreen({

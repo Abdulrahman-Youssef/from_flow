@@ -11,11 +11,11 @@ class HomeController extends GetxController {
   final RxString searchQuery = ''.obs;
   final RxString sortBy = 'date'.obs; // 'date', 'name', 'trips'
   // final RxList<SupplyDeliveryData> deliveries = <SupplyDeliveryData>[].obs;
-  final RxList<SupplyDeliveryData> deliveries = homeScreenList.obs;
+  final RxList<DeliveryData> deliveries = homeScreenList.obs;
 
   // Getters
-  List<SupplyDeliveryData> get filteredDeliveries {
-    List<SupplyDeliveryData> filtered = deliveries.where((delivery) {
+  List<DeliveryData> get filteredDeliveries {
+    List<DeliveryData> filtered = deliveries.where((delivery) {
       bool matchesSearch = false;
       switch (sortBy.value) {
         case 'name':
@@ -62,11 +62,11 @@ class HomeController extends GetxController {
     }
   }
 
-  void setDeliveries(List<SupplyDeliveryData> newDeliveries) {
+  void setDeliveries(List<DeliveryData> newDeliveries) {
     deliveries.assignAll(newDeliveries);
   }
 
-  void addDelivery(SupplyDeliveryData delivery) {
+  void addDelivery(DeliveryData delivery) {
     Get.toNamed("Dashboard");
     deliveries.add(delivery);
   }
@@ -76,7 +76,7 @@ class HomeController extends GetxController {
   }
 
   // put the edited
-  void updateDelivery(int index, SupplyDeliveryData delivery) {
+  void updateDelivery(int index, DeliveryData delivery) {
     if (index >= 0 && index < deliveries.length) {
       deliveries[index] = delivery;
     }
@@ -102,7 +102,7 @@ class HomeController extends GetxController {
   }
 
   // ✨ THIS IS THE METHOD TO CHANGE ✨
-  Future<void> onEditeDelivery(SupplyDeliveryData data) async {
+  Future<void> onEditeDelivery(DeliveryData data) async {
     // 1. Await the result from the dashboard screen
     final result = await Get.toNamed(
       AppRoutes.dashboard,
@@ -113,7 +113,7 @@ class HomeController extends GetxController {
     );
 
     // 2. Check if the result is valid and update the list
-    if (result != null && result is SupplyDeliveryData) {
+    if (result != null && result is DeliveryData) {
       // Find the index of the old delivery data using its unique ID
       final index = deliveries.indexWhere((d) => d.id == result.id);
 

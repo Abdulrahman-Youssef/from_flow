@@ -4,8 +4,8 @@ import 'package:form_flow/widgets/home_widgets/home_build_mini_state.dart';
 import 'package:intl/intl.dart';
 
 Widget buildDeliveryCard({
-  required SupplyDeliveryData delivery,
-  required void Function(SupplyDeliveryData) onDeliveryTap,
+  required DeliveryData delivery,
+  required void Function(DeliveryData) onDeliveryTap,
   required void Function(int id) onDeleteTap, // Added delete callback
 }) {
   return Card(

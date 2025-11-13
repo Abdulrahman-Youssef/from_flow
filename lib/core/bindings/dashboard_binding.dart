@@ -9,7 +9,7 @@ class DashboardBinding extends Bindings {
     final Map<String, dynamic> args = Get.arguments;
 
     // 2. Extract your data from the arguments map
-    final SupplyDeliveryData? data = args['data'];
+    final DeliveryData? data = args['data'];
     final DashboardControllerMode mode = args['mode'];
 
     // 3. Create and register your controllers with the dynamic data

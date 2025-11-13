@@ -2,8 +2,8 @@ import 'package:form_flow/models/delivery_model.dart';
 import 'package:form_flow/models/supplier_data.dart';
 import 'package:form_flow/models/trip_data.dart';
 
-List <SupplyDeliveryData> homeScreenList  = [
-  SupplyDeliveryData(
+List <DeliveryData> homeScreenList  = [
+  DeliveryData(
       id: 1,
       name: "name",
       date: DateTime(2025, 9, 23),
@@ -61,7 +61,7 @@ List <SupplyDeliveryData> homeScreenList  = [
               ),
             ])
       ], createdBy: '1'),
-  SupplyDeliveryData(
+  DeliveryData(
       id: 2,
       name: "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
       date: DateTime(2025, 9, 24),
@@ -119,7 +119,7 @@ List <SupplyDeliveryData> homeScreenList  = [
               ),
             ])
       ], createdBy: '1'),
-  SupplyDeliveryData(
+  DeliveryData(
       id: 3,
       name: "name",
       date: DateTime(2025, 9, 23),
@@ -177,7 +177,7 @@ List <SupplyDeliveryData> homeScreenList  = [
               ),
             ])
       ], createdBy: '1'),
-  SupplyDeliveryData(
+  DeliveryData(
       id: 4,
       name: "name",
       date: DateTime(2025, 9, 23),
@@ -235,7 +235,7 @@ List <SupplyDeliveryData> homeScreenList  = [
               ),
             ])
       ], createdBy: '1'),
-  SupplyDeliveryData(
+  DeliveryData(
       id: 5,
       name: "name",
       date: DateTime(2025, 9, 23),

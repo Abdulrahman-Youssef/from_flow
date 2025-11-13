@@ -1,6 +1,6 @@
 import 'package:form_flow/models/trip_data.dart';
 
-class SupplyDeliveryData {
+class DeliveryData {
   final int id;
   final String name;
   final DateTime date;
@@ -13,7 +13,7 @@ class SupplyDeliveryData {
   final DateTime? updatedAt;
   // ------------------
 
-  SupplyDeliveryData({
+  DeliveryData({
     required this.id,
     required this.name,
     required this.date,
@@ -25,9 +25,8 @@ class SupplyDeliveryData {
     this.updatedAt,
   });
 
-  // ✨ ADD THIS METHOD ✨
-  // It creates a copy of the current object, allowing you to override specific fields.
-  SupplyDeliveryData copyWith({
+
+  DeliveryData copyWith({
     int? id,
     String? name,
     DateTime? date,
@@ -38,7 +37,7 @@ class SupplyDeliveryData {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return SupplyDeliveryData(
+    return DeliveryData(
       // Use the new value if provided, otherwise use the old one (`this.name`).
       id: id ?? this.id,
       name: name ?? this.name,
@@ -83,8 +82,8 @@ class SupplyDeliveryData {
     };
   }
 
-  factory SupplyDeliveryData.fromJson(Map<String, dynamic> json) {
-    return SupplyDeliveryData(
+  factory DeliveryData.fromJson(Map<String, dynamic> json) {
+    return DeliveryData(
       id: json['id'] as int,
       name: json['name'] as String,
       date: DateTime.parse(json['date'] as String),
