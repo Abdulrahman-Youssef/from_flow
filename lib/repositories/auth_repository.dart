@@ -1,14 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:form_flow/core/data/constant/services_routes.dart';
+import 'package:form_flow/models/user_model.dart';
 import 'package:form_flow/service/auth_service.dart';
-import 'package:form_flow/service/api_service.dart';
+import 'package:form_flow/repositories/api_repository.dart';
 
 import '../core/utils/handle_dio_errors.dart';
 
 
 class AuthRepository   {
   // Get the singleton instances of the services
-  final ApiService _apiService = ApiService();
+  final ApiRepository _apiService = ApiRepository();
   final AuthService _authService = AuthService();
 
   /// Attempts to log the user in.
@@ -26,8 +27,8 @@ class AuthRepository   {
         final Map<String, dynamic> responseData = response.data;
 
         // Find the token in the response (adjust 'token' key if yours is different)
-        if (responseData.containsKey('access_token')) {
-          await _authService.saveToken(responseData['access_token']);
+        if (responseData.containsKey('access_token') && responseData.containsKey('user')) {
+          await _authService.saveAuth( token: responseData['access_token'], user: UserModel.fromJson(responseData['user']),);
         }
 
         return responseData; // e.g., {'token': '...', 'user': {...}}
@@ -86,7 +87,7 @@ class AuthRepository   {
 
         // Save the token on successful registration
         if (responseData.containsKey('access_token')) {
-          await _authService.saveToken(responseData['access_token']);
+          await _authService.saveAuth(token: responseData['access_token'], user: responseData['user'],);
         }
 
         return responseData;
@@ -113,7 +114,7 @@ class AuthRepository   {
     }
 
     // 2. ALWAYS delete the local token. This is the most important part.
-    await _authService.deleteToken();
+    await _authService.logout();
   }
 
   /// Standardizes error messages from Dio.

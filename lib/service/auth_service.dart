@@ -1,53 +1,68 @@
+import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:form_flow/models/user_model.dart';
+import 'shared_pref_service.dart'; // Import your SharedPrefService
 
 class AuthService {
-  // Singleton pattern: One instance for the whole app
+  // Singleton pattern
   AuthService._internal();
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
 
-  final _storage = const FlutterSecureStorage();
-  static const _tokenKey = 'auth_token'; // Key for secure storage
+  final _secureStorage = const FlutterSecureStorage();
+  static const _tokenKey = 'auth_token';
+  static const _userKey = 'auth_user';
 
-  // In-memory cache for the token to avoid disk reads
+  // In-memory cache
   String? _cachedToken;
+  UserModel? _cachedUser;
 
-  /// Saves the token to both secure storage and the in-memory cache.
-  Future<void> saveToken(String token) async {
-    try {
-      await _storage.write(key: _tokenKey, value: token);
-      _cachedToken = token;
-    } catch (e) {
-      print('Error saving token: $e');
-    }
+  final _sharedPref = SharedPrefService();
+
+  /// Save token and user together
+  Future<void> saveAuth({required String token, required UserModel user}) async {
+    _cachedToken = token;
+    _cachedUser = user;
+
+    // Save token securely
+    await _secureStorage.write(key: _tokenKey, value: token);
+
+    // Save user in SharedPrefService
+    await _sharedPref.saveJson(_userKey, user.toJson());
   }
 
-  /// Gets the token.
-  /// First, checks the in-memory cache.
-  /// If not found, attempts to read from secure storage.
+  /// Get token
   Future<String?> getToken() async {
-    // Return from cache if available
-    if (_cachedToken != null) {
-      return _cachedToken;
-    }
-
-    // If not in cache, try to read from storage
-    try {
-      _cachedToken = await _storage.read(key: _tokenKey);
-      return _cachedToken;
-    } catch (e) {
-      print('Error reading token: $e');
-      return null;
-    }
+    if (_cachedToken != null) return _cachedToken;
+    _cachedToken = await _secureStorage.read(key: _tokenKey);
+    return _cachedToken;
   }
 
-  /// Deletes the token from secure storage and clears the cache.
-  Future<void> deleteToken() async {
-    try {
-      await _storage.delete(key: _tokenKey);
-      _cachedToken = null;
-    } catch (e) {
-      print('Error deleting token: $e');
+  /// Get user
+  Future<UserModel?> getUser() async {
+    if (_cachedUser != null) return _cachedUser;
+
+    final userJson = _sharedPref.getJson(_userKey);
+    if (userJson != null) {
+      _cachedUser = UserModel.fromJson(userJson);
+      return _cachedUser;
     }
+
+    return null;
+  }
+
+  /// Delete token and user (logout)
+  Future<void> logout() async {
+    _cachedToken = null;
+    _cachedUser = null;
+
+    await _secureStorage.delete(key: _tokenKey);
+    await _sharedPref.remove(_userKey);
+  }
+
+  /// Check if user is logged in
+  Future<bool> isLoggedIn() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
   }
 }

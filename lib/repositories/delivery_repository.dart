@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:form_flow/core/data/constant/services_routes.dart';
 import 'package:form_flow/core/utils/handle_dio_errors.dart';
-import 'package:form_flow/service/api_service.dart';
+import 'package:form_flow/repositories/api_repository.dart';
 
 class DeliveryRepository  {
-  final ApiService _apiService = ApiService();
+  final ApiRepository _apiService = ApiRepository();
 
   // this what every function will return
   late Map<String, dynamic> responseData;

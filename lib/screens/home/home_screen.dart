@@ -9,14 +9,8 @@ import 'package:form_flow/widgets/home_widgets/home_search_section.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends GetView<HomeController> {
-  // will be moved to controllers until that happened it will stay here
-  final Function(DeliveryData) onDeliveryTap;
-  final VoidCallback onAddNewDelivery;
-
   const HomeScreen({
     super.key,
-    required this.onDeliveryTap,
-    required this.onAddNewDelivery,
   });
 
   @override
@@ -32,7 +26,8 @@ class HomeScreen extends GetView<HomeController> {
             onLogout: Get.find<AppController>().logout,
             onSettingsTap: () {},
             onUserTap: () {},
-            userName: 'ahmed',
+            userName: controller.user.name,
+            // userName: "fd",
           ),
 
           // Search and Filter Section

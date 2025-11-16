@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:form_flow/controllers/delivery_controller.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:form_flow/models/responses/delivery_summary_response.dart';
+import 'package:form_flow/models/user_model.dart';
+import 'package:form_flow/service/user_service.dart';
 import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:form_flow/models/delivery_model.dart';
@@ -11,8 +13,9 @@ import '../../core/data/constant/Deliveries.dart';
 class HomeController extends GetxController {
   final deliveryController = Get.find<DeliveryController>();
 
+  final userService = Get.find<UserService>();
 
-
+ late final UserModel user =  userService.user! ;
 
 
   // Observable variables
@@ -63,11 +66,25 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     loadDeliveries();  // call async method
+    loadUserInfo();
   }
 
   Future<void> loadDeliveries() async {
     deliveries.value = await deliveryController.handleDeliveriesSummary();
   }
+
+  Future<void> loadUserInfo() async {
+
+    if(userService.user != null){
+      throw "user is not empty";
+
+    // user = userService.user!;
+    }else{
+      throw "user is empty";
+    }
+
+  }
+
   // Methods
   void updateSearchQuery(String query) {
     searchQuery.value = query;
