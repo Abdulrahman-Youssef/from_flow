@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/controllers/delivery_controller.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
+import 'package:form_flow/models/responses/delivery_summary_response.dart';
 import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:form_flow/models/delivery_model.dart';
@@ -7,28 +9,32 @@ import 'package:intl/intl.dart';
 import '../../core/data/constant/Deliveries.dart';
 
 class HomeController extends GetxController {
+  final deliveryController = Get.find<DeliveryController>();
+
+
+
+
+
   // Observable variables
   final RxString searchQuery = ''.obs;
   final RxString sortBy = 'date'.obs; // 'date', 'name', 'trips'
   // final RxList<SupplyDeliveryData> deliveries = <SupplyDeliveryData>[].obs;
-  final RxList<DeliveryData> deliveries = homeScreenList.obs;
+  // final RxList<DeliveryData> deliveries = homeScreenList.obs;
+  final RxList<DeliverySummary> deliveries = <DeliverySummary>[].obs;
 
   // Getters
-  List<DeliveryData> get filteredDeliveries {
-    List<DeliveryData> filtered = deliveries.where((delivery) {
+  List<DeliverySummary> get filteredDeliveries {
+    List<DeliverySummary> filtered = deliveries.where((delivery) {
       bool matchesSearch = false;
       switch (sortBy.value) {
         case 'name':
-          return matchesSearch = delivery.name
+          return matchesSearch = delivery.deliveryName
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase());
-        case 'trips':
-          return matchesSearch =
-              delivery.trips.length.toString() == searchQuery.value;
         case 'date':
         default:
           return matchesSearch = DateFormat('dd/MM/yyyy')
-              .format(delivery.date)
+              .format(delivery.deliveryDate)
               .contains(searchQuery.value); // Most recent first
       }
 
@@ -39,18 +45,29 @@ class HomeController extends GetxController {
     filtered.sort((a, b) {
       switch (sortBy.value) {
         case 'name':
-          return a.name.compareTo(b.name);
+          return a.deliveryName.compareTo(b.deliveryName);
         case 'trips':
           return b.tripsCount.compareTo(a.tripsCount);
         case 'date':
         default:
-          return b.date.compareTo(a.date); // Most recent first
+          return b.deliveryDate.compareTo(a.deliveryDate); // Most recent first
       }
     });
 
     return filtered;
   }
 
+
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadDeliveries();  // call async method
+  }
+
+  Future<void> loadDeliveries() async {
+    deliveries.value = await deliveryController.handleDeliveriesSummary();
+  }
   // Methods
   void updateSearchQuery(String query) {
     searchQuery.value = query;
@@ -62,21 +79,21 @@ class HomeController extends GetxController {
     }
   }
 
-  void setDeliveries(List<DeliveryData> newDeliveries) {
-    deliveries.assignAll(newDeliveries);
-  }
+  // void setDeliveries(List<DeliveryData> newDeliveries) {
+  //   deliveries.assignAll(newDeliveries);
+  // }
 
-  void addDelivery(DeliveryData delivery) {
-    Get.toNamed("Dashboard");
-    deliveries.add(delivery);
-  }
+  // void addDelivery(DeliveryData delivery) {
+  //   Get.toNamed("Dashboard");
+  //   deliveries.add(delivery);
+  // }
 
   void removeDelivery(int deliveryID) {
-    deliveries.removeWhere((delivery) => delivery.id == deliveryID);
+    deliveries.removeWhere((delivery) => delivery.deliveryId == deliveryID);
   }
 
   // put the edited
-  void updateDelivery(int index, DeliveryData delivery) {
+  void updateDelivery(int index, DeliverySummary delivery) {
     if (index >= 0 && index < deliveries.length) {
       deliveries[index] = delivery;
     }
@@ -102,7 +119,7 @@ class HomeController extends GetxController {
   }
 
   // ✨ THIS IS THE METHOD TO CHANGE ✨
-  Future<void> onEditeDelivery(DeliveryData data) async {
+  Future<void> onEditeDelivery(DeliverySummary data) async {
     // 1. Await the result from the dashboard screen
     final result = await Get.toNamed(
       AppRoutes.dashboard,
@@ -113,9 +130,9 @@ class HomeController extends GetxController {
     );
 
     // 2. Check if the result is valid and update the list
-    if (result != null && result is DeliveryData) {
+    if (result != null && result is DeliverySummary) {
       // Find the index of the old delivery data using its unique ID
-      final index = deliveries.indexWhere((d) => d.id == result.id);
+      final index = deliveries.indexWhere((d) => d.deliveryId == result.deliveryId);
 
       // If found, update it in the list
       if (index != -1) {
@@ -125,7 +142,7 @@ class HomeController extends GetxController {
 
       Get.snackbar(
         'Success',
-        'Delivery "${result.name}" saved successfully!',
+        'Delivery "${result.deliveryName}" saved successfully!',
         // 'Delivery "{finalDelivery.name}" saved successfully!',
         backgroundColor: Colors.green,
         colorText: Colors.white,

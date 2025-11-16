@@ -14,7 +14,7 @@ enum DialogMode { add, edit }
 enum DateType { planArrive, actualArrive, actualDeparture }
 
 class AddEditDialogController extends GetxController {
-  final DropDownDataController controller = Get.find<DropDownDataController>();
+  final DropDownDataController dropDownDataController = Get.find<DropDownDataController>();
 
   final DialogMode mode;
   final TripData? editData;
@@ -51,11 +51,11 @@ class AddEditDialogController extends GetxController {
     super.onInit();
 
     // Load all options from the controller
-    supplierOptions = controller.suppliers;
-    storageOptions = controller.storages;
-    vehicleNOOptions = controller.vehicles;
-    procurementSpecialists = controller.procurementSpecialists;
-    fleetSupervisors = controller.fleetSupervisors;
+    supplierOptions = dropDownDataController.suppliers;
+    storageOptions = dropDownDataController.storages;
+    vehicleNOOptions = dropDownDataController.vehicles;
+    procurementSpecialists = dropDownDataController.procurementSpecialists;
+    fleetSupervisors = dropDownDataController.fleetSupervisors;
 
     if (mode == DialogMode.edit && editData != null) {
       final data = editData!;
