@@ -5,6 +5,10 @@ class ServicesRoutes {
   static const String user = "/user";
   static const String profilePicture = "/profile-picture";
 
+// it will get the min and latest app version
+  static const String appVersion = "/app-version";
+
+
   static const String deliveryDropData = "/delivery-form-data";
 
   // Base route
