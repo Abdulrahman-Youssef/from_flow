@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:form_flow/models/shipment_model.dart';
+import 'package:form_flow/models/delivery_model.dart';
+import 'package:form_flow/models/responses/delivery_summary_response.dart';
 import 'package:form_flow/widgets/home_widgets/home_build_mini_state.dart';
 import 'package:intl/intl.dart';
 
 Widget buildDeliveryCard({
-  required SupplyDeliveryData delivery,
-  required void Function(SupplyDeliveryData) onDeliveryTap,
+  required DeliverySummary delivery,
+  required void Function(int deliveryID) onDeliveryTap,
   required void Function(int id) onDeleteTap, // Added delete callback
 }) {
   return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     child: InkWell(
-      onTap: () => onDeliveryTap(delivery),
+      onTap: () => onDeliveryTap(delivery.deliveryId),
       borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -26,7 +27,7 @@ Widget buildDeliveryCard({
               children: [
                 Expanded(
                   child: Text(
-                    delivery.name,
+                    delivery.deliveryName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -45,7 +46,7 @@ Widget buildDeliveryCard({
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    DateFormat('dd/MM').format(delivery.date),
+                    DateFormat('dd/MM').format(delivery.deliveryDate),
                     style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -62,7 +63,7 @@ Widget buildDeliveryCard({
                     iconSize: 18,
                     splashRadius: 20,
                     icon: Icon(Icons.delete_outline, color: Colors.red.shade700),
-                    onPressed: () => onDeleteTap(delivery.id),
+                    onPressed: () => onDeleteTap(delivery.deliveryId),
                   ),
                 ),
                 // **** END: DELETE BUTTON ADDED ****
@@ -72,7 +73,7 @@ Widget buildDeliveryCard({
             const SizedBox(height: 8),
 
             Text(
-              DateFormat('EEEE, dd MMMM yyyy').format(delivery.date),
+              DateFormat('EEEE, dd MMMM yyyy').format(delivery.deliveryDate),
               style: TextStyle(
                 fontSize: 11,
                 color: Colors.grey.shade600,
@@ -108,7 +109,7 @@ Widget buildDeliveryCard({
               children: [
                 Expanded(
                   child: buildMiniStat(
-                    delivery.vehiclesCount.toString(),
+                    delivery.tripsCount.toString(),
                     'Vehicles',
                     'مركبات',
                     Icons.local_shipping,

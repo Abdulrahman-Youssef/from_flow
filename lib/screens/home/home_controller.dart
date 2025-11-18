@@ -1,34 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:form_flow/controllers/delivery_controller.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
-import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
+import 'package:form_flow/models/responses/delivery_summary_response.dart';
+import 'package:form_flow/models/user_model.dart';
+import 'package:form_flow/service/user_service.dart';
+import 'package:form_flow/screens/Dashboard/dashboard_controller.dart';
 import 'package:get/get.dart';
-import 'package:form_flow/models/shipment_model.dart';
 import 'package:intl/intl.dart';
-import '../../core/data/constant/Deliveries.dart';
 
 class HomeController extends GetxController {
+  final deliveryController = Get.find<DeliveryController>();
+
+  final userService = Get.find<UserService>();
+
+  late final UserModel user = userService.user!;
+
   // Observable variables
   final RxString searchQuery = ''.obs;
   final RxString sortBy = 'date'.obs; // 'date', 'name', 'trips'
   // final RxList<SupplyDeliveryData> deliveries = <SupplyDeliveryData>[].obs;
-  final RxList<SupplyDeliveryData> deliveries = homeScreenList.obs;
+  // final RxList<DeliveryData> deliveries = homeScreenList.obs;
+  final RxList<DeliverySummary> deliveries = <DeliverySummary>[].obs;
 
   // Getters
-  List<SupplyDeliveryData> get filteredDeliveries {
-    List<SupplyDeliveryData> filtered = deliveries.where((delivery) {
+  List<DeliverySummary> get filteredDeliveries {
+    List<DeliverySummary> filtered = deliveries.where((delivery) {
       bool matchesSearch = false;
       switch (sortBy.value) {
         case 'name':
-          return matchesSearch = delivery.name
+          return matchesSearch = delivery.deliveryName
               .toLowerCase()
               .contains(searchQuery.value.toLowerCase());
-        case 'trips':
-          return matchesSearch =
-              delivery.trips.length.toString() == searchQuery.value;
         case 'date':
         default:
           return matchesSearch = DateFormat('dd/MM/yyyy')
-              .format(delivery.date)
+              .format(delivery.deliveryDate)
               .contains(searchQuery.value); // Most recent first
       }
 
@@ -39,16 +45,35 @@ class HomeController extends GetxController {
     filtered.sort((a, b) {
       switch (sortBy.value) {
         case 'name':
-          return a.name.compareTo(b.name);
+          return a.deliveryName.compareTo(b.deliveryName);
         case 'trips':
           return b.tripsCount.compareTo(a.tripsCount);
         case 'date':
         default:
-          return b.date.compareTo(a.date); // Most recent first
+          return b.deliveryDate.compareTo(a.deliveryDate); // Most recent first
       }
     });
 
     return filtered;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadDeliveries(); // call async method
+    // loadUserInfo();
+  }
+
+  Future<void> loadDeliveries() async {
+    deliveries.value = await deliveryController.handleDeliveriesSummary();
+  }
+
+  Future<void> _loadUserInfo() async {
+    if (userService.user != null) {
+      // user = userService.user!;
+    } else {
+      throw "user is empty";
+    }
   }
 
   // Methods
@@ -62,21 +87,32 @@ class HomeController extends GetxController {
     }
   }
 
-  void setDeliveries(List<SupplyDeliveryData> newDeliveries) {
-    deliveries.assignAll(newDeliveries);
-  }
+  // void setDeliveries(List<DeliveryData> newDeliveries) {
+  //   deliveries.assignAll(newDeliveries);
+  // }
 
-  void addDelivery(SupplyDeliveryData delivery) {
-    Get.toNamed("Dashboard");
-    deliveries.add(delivery);
-  }
+  // void addDelivery(DeliveryData delivery) {
+  //   Get.toNamed("Dashboard");
+  //   deliveries.add(delivery);
+  // }
 
-  void removeDelivery(int deliveryID) {
-    deliveries.removeWhere((delivery) => delivery.id == deliveryID);
+  void removeDelivery(int deliveryID) async {
+    if (await deliveryController.removeDelivery(deliveryID)) {
+      deliveries.removeWhere((delivery) => delivery.deliveryId == deliveryID);
+      Get.snackbar(
+        'Success',
+        'Delivery has been deleted "${deliveryID}" saved successfully!',
+        // 'Delivery "{finalDelivery.name}" saved successfully!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } else {
+      throw "the delivery has problem in deleting";
+    }
   }
 
   // put the edited
-  void updateDelivery(int index, SupplyDeliveryData delivery) {
+  void updateDelivery(int index, DeliverySummary delivery) {
     if (index >= 0 && index < deliveries.length) {
       deliveries[index] = delivery;
     }
@@ -88,49 +124,27 @@ class HomeController extends GetxController {
       "data": null,
       "mode": DashboardControllerMode.addedNew,
     });
-    if (result != null) {
-      deliveries.add(result);
+    // to get the added delivery
+    loadDeliveries();
 
-      Get.snackbar(
-        'Success',
-        'Delivery "${result.name}" saved successfully!',
-        // 'Delivery "{finalDelivery.name}" saved successfully!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    }
+
   }
 
   // ✨ THIS IS THE METHOD TO CHANGE ✨
-  Future<void> onEditeDelivery(SupplyDeliveryData data) async {
+  Future<void> onEditeDelivery(int deliveryID) async {
+    final deliveryController = Get.find<DeliveryController>();
+    final deliveryData = await deliveryController.fetchDelivery(deliveryID);
     // 1. Await the result from the dashboard screen
     final result = await Get.toNamed(
       AppRoutes.dashboard,
       arguments: {
-        "data": data,
+        "deliveryData": deliveryData,
         "mode": DashboardControllerMode.edit,
       },
     );
+    // get the delivery and update that one
+    loadDeliveries();
 
-    // 2. Check if the result is valid and update the list
-    if (result != null && result is SupplyDeliveryData) {
-      // Find the index of the old delivery data using its unique ID
-      final index = deliveries.indexWhere((d) => d.id == result.id);
-
-      // If found, update it in the list
-      if (index != -1) {
-        // This will automatically refresh your UI because `deliveries` is an .obs list!
-        updateDelivery(index, result);
-      }
-
-      Get.snackbar(
-        'Success',
-        'Delivery "${result.name}" saved successfully!',
-        // 'Delivery "{finalDelivery.name}" saved successfully!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    }
   }
 
   int getCrossAxisCount(double width) {

@@ -29,7 +29,7 @@ class MyRouting {
     ),
     GetPage(
       name: AppRoutes.homePage,
-      page: () => HomeScreen(onDeliveryTap: (s) {}, onAddNewDelivery: () {}),
+      page: () => HomeScreen(),
       transition: Transition.noTransition,
       binding: HomePageBinding(),// Optional: customize transition
       // middlewares: [AuthMiddleware()],

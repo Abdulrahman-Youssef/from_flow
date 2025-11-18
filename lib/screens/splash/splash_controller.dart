@@ -39,7 +39,7 @@ class SplashController extends GetxController {
       print("Token verification failed: $e");
 
       // Just in case, delete the bad token
-      await _authService.deleteToken();
+      await _authService.logout();
 
       // Send to Login
       Get.offAllNamed(AppRoutes.login);

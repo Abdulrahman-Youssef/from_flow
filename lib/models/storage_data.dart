@@ -1,10 +1,10 @@
-class StorageData {
+class StorageModel {
   final int? id;
   final String? name;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  const StorageData({
+  const StorageModel({
      this.id,
      this.name,
     this.createdAt,
@@ -12,13 +12,13 @@ class StorageData {
   });
 
   // Copy with method for immutability
-  StorageData copyWith({
+  StorageModel copyWith({
     int? id,
     String? name,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return StorageData(
+    return StorageModel(
       id: id ?? this.id,
       name: name ?? this.name,
       createdAt: createdAt ?? this.createdAt,
@@ -31,7 +31,7 @@ class StorageData {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is StorageData &&
+    return other is StorageModel &&
         other.id == id &&
         other.name == name;
   }
@@ -50,8 +50,8 @@ class StorageData {
   }
 
   // JSON deserialization
-  factory StorageData.fromJson(Map<String, dynamic> json) {
-    return StorageData(
+  factory StorageModel.fromJson(Map<String, dynamic> json) {
+    return StorageModel(
       id: json['id'] as int,
       name: json['name'] as String,
       createdAt: json['createdAt'] != null
@@ -64,7 +64,7 @@ class StorageData {
   }
 
   @override
-  String toString() => 'StorageData(id: $id, name: $name)';
+  String toString() => '$name';
 
   // Validation method
   bool isValid() => id! > 0 && name!.isNotEmpty;

@@ -1,15 +1,15 @@
-
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-class ReusableSearchableDropdown extends StatelessWidget {
-  final List<String> items;
-  final String? selectedItem;
-  final Function(String?) onChanged;
+// 1. Make the class generic with <T>
+class ReusableSearchableDropdown<T> extends StatelessWidget {
+  final List<T> items; // <-- CHANGED
+  final T? selectedItem; // <-- CHANGED
+  final Function(T?) onChanged; // <-- CHANGED
   final String labelText;
   final String? hintText;
   final String? searchHint;
-  final String? Function(String?)? validator;
+  final String? Function(T?)? validator; // <-- CHANGED
   final bool enabled;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
@@ -17,12 +17,18 @@ class ReusableSearchableDropdown extends StatelessWidget {
   final Color? backgroundColor;
   final double elevation;
 
+  final bool Function(T?, T?)? compareFn;
+  // 2. Add a function to convert your object 'T' to a string
+  final String Function(T item) itemAsString; // <-- NEW & REQUIRED
+
   const ReusableSearchableDropdown({
     super.key,
     required this.items,
     this.selectedItem,
     required this.onChanged,
     required this.labelText,
+    required this.itemAsString, // <-- NEW & REQUIRED
+     this.compareFn,
     this.hintText,
     this.searchHint,
     this.validator,
@@ -36,15 +42,18 @@ class ReusableSearchableDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownSearch<String>(
+    // 3. Change DropdownSearch<String> to <T>
+    return DropdownSearch<T>(
+      // 4. Update filtering logic
       items: (filter, infiniteScrollProps) async {
-        // Return filtered items based on search
         if (filter.isEmpty) {
           return items;
         }
+        // Use itemAsString to filter
         return items
-            .where((item) =>
-            item.toLowerCase().contains(filter.toLowerCase()))
+            .where((item) => itemAsString(item) // <-- CHANGED
+            .toLowerCase()
+            .contains(filter.toLowerCase()))
             .toList();
       },
       selectedItem: selectedItem,
@@ -58,6 +67,7 @@ class ReusableSearchableDropdown extends StatelessWidget {
           suffixIcon: suffixIcon,
         ),
       ),
+      compareFn: compareFn,
       popupProps: PopupProps.menu(
         showSearchBox: true,
         searchFieldProps: TextFieldProps(
@@ -72,6 +82,7 @@ class ReusableSearchableDropdown extends StatelessWidget {
           elevation: elevation,
         ),
         constraints: BoxConstraints(maxHeight: maxHeight!),
+        // 5. Update the item builder
         itemBuilder: (context, item, isDisabled, isSelected) {
           return Container(
             padding: EdgeInsets.all(16),
@@ -82,7 +93,8 @@ class ReusableSearchableDropdown extends StatelessWidget {
               ),
             ),
             child: Text(
-              item,
+              // "this is the text",
+              itemAsString(item), // <-- CHANGED
               style: TextStyle(
                 color: isDisabled ? Colors.grey : Colors.black,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,

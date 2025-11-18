@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/app_state.dart';
 import 'package:form_flow/screens/home/home_controller.dart';
-import 'package:form_flow/models/shipment_model.dart';
 import 'package:form_flow/widgets/home_widgets/home_build_delivery_card.dart';
 import 'package:form_flow/widgets/home_widgets/home_build_empty_state.dart';
 import 'package:form_flow/widgets/home_widgets/home_header_section.dart';
@@ -9,14 +8,8 @@ import 'package:form_flow/widgets/home_widgets/home_search_section.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends GetView<HomeController> {
-  // will be moved to controllers until that happened it will stay here
-  final Function(SupplyDeliveryData) onDeliveryTap;
-  final VoidCallback onAddNewDelivery;
-
   const HomeScreen({
     super.key,
-    required this.onDeliveryTap,
-    required this.onAddNewDelivery,
   });
 
   @override
@@ -32,7 +25,8 @@ class HomeScreen extends GetView<HomeController> {
             onLogout: Get.find<AppController>().logout,
             onSettingsTap: () {},
             onUserTap: () {},
-            userName: 'ahmed',
+            userName: controller.user.name,
+            // userName: "fd",
           ),
 
           // Search and Filter Section

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
 // import 'package:get/get_connect/http/src/response/response.dart' hide Response; // Not needed
-import 'auth_service.dart';
+import '../service/auth_service.dart';
 
-class ApiService {
+class ApiRepository {
   // This is fine. GetX will find the service from your AppBinding.
   final AuthService _authService = Get.find<AuthService>();
 
@@ -11,11 +11,11 @@ class ApiService {
   static const String _baseUrl = "https://api-ibn-sina.abdulrahman.lt/api";
 
   // 2. The Singleton Pattern
-  ApiService._internal() {
+  ApiRepository._internal() {
     _setupDio();
   }
-  static final ApiService _instance = ApiService._internal();
-  factory ApiService() => _instance;
+  static final ApiRepository _instance = ApiRepository._internal();
+  factory ApiRepository() => _instance;
 
   // 3. The Dio instance
   final Dio _dio = Dio();

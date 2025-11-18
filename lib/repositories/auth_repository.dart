@@ -1,12 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:form_flow/core/data/constant/services_routes.dart';
+import 'package:form_flow/models/user_model.dart';
 import 'package:form_flow/service/auth_service.dart';
-import 'package:form_flow/service/api_service.dart';
+import 'package:form_flow/repositories/api_repository.dart';
+
+import '../core/utils/handle_dio_errors.dart';
 
 
 class AuthRepository   {
   // Get the singleton instances of the services
-  final ApiService _apiService = ApiService();
+  final ApiRepository _apiService = ApiRepository();
   final AuthService _authService = AuthService();
 
   /// Attempts to log the user in.
@@ -24,8 +27,8 @@ class AuthRepository   {
         final Map<String, dynamic> responseData = response.data;
 
         // Find the token in the response (adjust 'token' key if yours is different)
-        if (responseData.containsKey('access_token')) {
-          await _authService.saveToken(responseData['access_token']);
+        if (responseData.containsKey('access_token') && responseData.containsKey('user')) {
+          await _authService.saveAuth( token: responseData['access_token'], user: UserModel.fromJson(responseData['user']),);
         }
 
         return responseData; // e.g., {'token': '...', 'user': {...}}
@@ -33,7 +36,7 @@ class AuthRepository   {
         throw 'Failed to log in. Invalid server response.';
       }
     } on DioException catch (e) {
-      throw _handleDioException(e); // Standardized error
+      throw handleDioException(e); // Standardized error
     } catch (e) {
       throw 'An unexpected error occurred: $e';
     }
@@ -58,7 +61,7 @@ class AuthRepository   {
     } on DioException catch (e) {
       // If the token is expired or invalid, the server will return a 401
       // and our helper will throw a clean error.
-      throw _handleDioException(e);
+      throw handleDioException(e);
     } catch (e) {
       throw 'An unexpected error occurred: $e';
     }
@@ -84,7 +87,7 @@ class AuthRepository   {
 
         // Save the token on successful registration
         if (responseData.containsKey('access_token')) {
-          await _authService.saveToken(responseData['access_token']);
+          await _authService.saveAuth(token: responseData['access_token'], user: responseData['user'],);
         }
 
         return responseData;
@@ -92,7 +95,7 @@ class AuthRepository   {
         throw 'Failed to register. Invalid server response.';
       }
     } on DioException catch (e) {
-      throw _handleDioException(e);
+      throw handleDioException(e);
     } catch (e) {
       throw 'An unexpected error occurred: $e';
     }
@@ -111,40 +114,9 @@ class AuthRepository   {
     }
 
     // 2. ALWAYS delete the local token. This is the most important part.
-    await _authService.deleteToken();
+    await _authService.logout();
   }
 
   /// Standardizes error messages from Dio.
-  String _handleDioException(DioException e) {
-    if (e.type == DioExceptionType.connectionTimeout ||
-        e.type == DioExceptionType.sendTimeout ||
-        e.type == DioExceptionType.receiveTimeout) {
-      return 'Connection timed out. Please check your internet.';
-    }
 
-    if (e.type == DioExceptionType.badResponse) {
-      if (e.response?.statusCode == 401) {
-        return 'Invalid email or password.';
-      }
-      if (e.response?.statusCode == 422) { // Validation error
-        try {
-          // Assumes your Laravel API returns errors like: {'errors': {'email': ['...']}}
-          Map<String, dynamic> errors = e.response?.data['errors'];
-          return errors.values.first[0]; // Get the first error message
-        } catch (_) {
-          return 'Invalid data provided.';
-        }
-      }
-      if (e.response?.statusCode == 500) {
-        return 'Server error. Please try again later.';
-      }
-      return 'Error: ${e.response?.statusMessage}';
-    }
-
-    if (e.type == DioExceptionType.connectionError) {
-      return 'No internet connection.';
-    }
-
-    return 'An unknown error occurred.';
-  }
 }

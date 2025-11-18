@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:form_flow/core/bindings/app_binding.dart';
 import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:form_flow/routing.dart';
+import 'package:form_flow/service/shared_pref_service.dart';
 import 'package:get/get.dart';
 import 'app_state.dart';
 
-void main() {
-
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefService().init();
   Get.put(AppController());
   runApp(MyApp());
 }
