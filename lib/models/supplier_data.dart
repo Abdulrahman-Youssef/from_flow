@@ -35,11 +35,18 @@ class SupplierModel {
 
 
   String get waitingTime {
-    final difference = actualDepartureDate!.difference(actualArriveDate!);
-    final hours = difference.inHours;
-    final minutes = difference.inMinutes.remainder(60);
-
+    // null error
+    if(actualArriveDate != null && actualDepartureDate != null )
+      {
+        final difference = actualDepartureDate!.difference(actualArriveDate!);
+        final hours = difference.inHours;
+        final minutes = difference.inMinutes.remainder(60);
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+      }
+    else{
+      return "not set yet";
+    }
+
   }
 
   Map<String, dynamic> toJson() {
@@ -55,15 +62,15 @@ class SupplierModel {
   factory SupplierModel.fromJson(Map<String, dynamic> json) {
     return SupplierModel(
       id: json['id'] as int?,
-      supplierName: json['supplier_name'] as String?,
-      actualArriveDate: json['actualArriveDate'] != null
-          ? DateTime.parse(json['actualArriveDate'] as String)
+      supplierName: json['name'] as String?,
+      actualArriveDate: json['actual_arrive_date'] != null
+          ? DateTime.parse(json['actual_arrive_date'] as String)
           : null,
-      actualDepartureDate: json['actualDepartureDate'] != null
-          ? DateTime.parse(json['actualDepartureDate'] as String)
+      actualDepartureDate: json['actual_departure_date'] != null
+          ? DateTime.parse(json['actual_departure_date'] as String)
           : null,
-      planArriveDate: json['planArriveDate'] != null
-          ? DateTime.parse(json['planArriveDate'] as String)
+      planArriveDate: json['plan_arrive_date'] != null
+          ? DateTime.parse(json['plan_arrive_date'] as String)
           : null,
     );
   }

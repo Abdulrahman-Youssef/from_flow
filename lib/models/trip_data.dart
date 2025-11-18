@@ -1,12 +1,16 @@
+import 'package:form_flow/models/fleet_supervisors_model.dart';
+import 'package:form_flow/models/procurement_specialists_model.dart';
 import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
+import 'package:form_flow/models/vehicle_model.dart';
 
 class TripData {
   final int? id;
-  final String vehicleCode;
-  final String procurementSpecialist;
-  final String fleetSupervisor;
-  final List<SupplierModel> suppliers ;
+  final VehicleModel vehicle;
+  final ProcurementSpecialistsModel procurementSpecialist;
+  final FleetSupervisorsModel fleetSupervisor;
+  final List<SupplierModel> suppliers;
+
   final List<StorageModel> storages;
   final String? note;
 
@@ -14,7 +18,7 @@ class TripData {
 
   TripData({
     this.id,
-    required this.vehicleCode,
+    required this.vehicle,
     required this.storages,
     required this.procurementSpecialist,
     required this.fleetSupervisor,
@@ -26,40 +30,55 @@ class TripData {
   // --- UPDATED copyWith (Fixed typo and added 'note') ---
   TripData copyWith({
     int? id,
-    String? vehicleCode,
-    String? procurementSpecialist,
-    String? fleetSupervisor,
+    VehicleModel? vehicle,
+    ProcurementSpecialistsModel? procurementSpecialist,
+    FleetSupervisorsModel? fleetSupervisor,
     List<SupplierModel>? suppliers,
     List<StorageModel>? storages, // <-- Renamed from 'storageName'
     String? note,
   }) {
     return TripData(
       id: id ?? this.id,
-      vehicleCode: vehicleCode ?? this.vehicleCode,
-      storages: storages ?? this.storages, // <-- Fixed logic
+      vehicle: vehicle ?? this.vehicle,
+      storages: storages ?? this.storages,
+      // <-- Fixed logic
       procurementSpecialist:
-      procurementSpecialist ?? this.procurementSpecialist,
+          procurementSpecialist ?? this.procurementSpecialist,
       fleetSupervisor: fleetSupervisor ?? this.fleetSupervisor,
       suppliers: suppliers ?? this.suppliers,
       note: note ?? this.note, // <-- Added note
     );
   }
 
-  // --- Getters (no changes) ---
-  DateTime? get earliestArrival => suppliers
-      .map((s) => s.actualArriveDate)
-      .reduce((a, b) => a!.isBefore(b!) ? a : b);
+  DateTime? get earliestArrival {
+    // Filter out null actualArriveDate
+    final dates = suppliers.map((s) => s.actualArriveDate).whereType<DateTime>().toList();
+    if (dates.isEmpty) return null;
+    return dates.reduce((a, b) => a.isBefore(b) ? a : b);
+  }
 
-  DateTime? get latestDeparture => suppliers
-      .map((s) => s.actualDepartureDate)
-      .reduce((a, b) => a!.isAfter(b!) ? a : b);
+  DateTime? get latestDeparture {
+    // Filter out null actualDepartureDate
+    final dates = suppliers.map((s) => s.actualDepartureDate).whereType<DateTime>().toList();
+    if (dates.isEmpty) return null;
+    return dates.reduce((a, b) => a.isAfter(b) ? a : b);
+  }
 
   String get totalWaitingTime {
-    final difference = latestDeparture!.difference(earliestArrival!);
-    final hours = difference.inHours;
-    final minutes = difference.inMinutes.remainder(60);
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+    final start = earliestArrival;
+    final end = latestDeparture;
+
+    if (start != null && end != null) {
+      final difference = end.difference(start);
+      final hours = difference.inHours;
+      final minutes = difference.inMinutes.remainder(60);
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+    } else {
+      return "not assigned yet";
+    }
   }
+
+
 
   String get suppliersList {
     if (suppliers.length == 1) {
@@ -69,11 +88,10 @@ class TripData {
     }
   }
 
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'vehicleCode': vehicleCode,
+      'vehicleCode': vehicle,
       'procurementSpecialist': procurementSpecialist,
       'fleetSupervisor': fleetSupervisor,
       'note': note,
@@ -85,9 +103,10 @@ class TripData {
   factory TripData.fromJson(Map<String, dynamic> json) {
     return TripData(
       id: json['id'] as int?,
-      vehicleCode: json['vehicleCode'] as String,
-      procurementSpecialist: json['procurementSpecialist'] as String,
-      fleetSupervisor: json['fleetSupervisor'] as String,
+      vehicle: VehicleModel.fromJson(json['vehicle']),
+      procurementSpecialist:
+          ProcurementSpecialistsModel.fromJson(json['procurement_specialist']),
+      fleetSupervisor: FleetSupervisorsModel.fromJson(json['fleet_supervisor']),
       note: json['note'] as String?,
       suppliers: (json['suppliers'] as List<dynamic>)
           .map((s) => SupplierModel.fromJson(s as Map<String, dynamic>))

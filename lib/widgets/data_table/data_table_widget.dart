@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_flow/models/trip_data.dart';
-import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
+import 'package:form_flow/screens/Dashboard/dashboard_controller.dart';
 import 'package:get/get.dart';
 import '../dashboard_widgets/dashboard_build_expanded_details.dart';
 import '../dashboard_widgets/dashboard_build_responsive_header.dart';
@@ -186,7 +186,7 @@ class DataTableWidget extends GetView<DashboardController> {
                                           ),
                                           child: Center(
                                             child: Text(
-                                              trip.vehicleCode,
+                                              trip.vehicle.vehicleCode,
                                               style: TextStyle(
                                                   color: Colors.white),
                                             ),
@@ -218,7 +218,7 @@ class DataTableWidget extends GetView<DashboardController> {
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 4),
                                           child: Text(
-                                            trip.procurementSpecialist,
+                                            trip.procurementSpecialist.name,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
@@ -230,7 +230,7 @@ class DataTableWidget extends GetView<DashboardController> {
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 4),
                                           child: Text(
-                                            trip.fleetSupervisor,
+                                            trip.fleetSupervisor.name,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),

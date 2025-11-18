@@ -6,7 +6,7 @@ import 'package:form_flow/models/storage_data.dart';
 import 'package:form_flow/models/supplier_data.dart';
 import 'package:form_flow/models/trip_data.dart';
 import 'package:form_flow/models/vehicle_model.dart';
-import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
+import 'package:form_flow/screens/Dashboard/dashboard_controller.dart';
 import 'package:get/get.dart';
 
 enum DialogMode { add, edit }
@@ -51,6 +51,7 @@ class AddEditDialogController extends GetxController {
     super.onInit();
 
     // Load all options from the controller
+    print("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii ${dropDownDataController.suppliers.length}");
     supplierOptions = dropDownDataController.suppliers;
     storageOptions = dropDownDataController.storages;
     vehicleNOOptions = dropDownDataController.vehicles;
@@ -62,14 +63,14 @@ class AddEditDialogController extends GetxController {
       noteController = TextEditingController(text: data.note);
 
       selectedVehicle.value = vehicleNOOptions.firstWhereOrNull(
-        (v) => v.vehicleCode == data.vehicleCode,
+        (v) => v.id == data.vehicle.id,
       );
       selectedProcurementSpecialist.value =
           procurementSpecialists.firstWhereOrNull(
-        (p) => p.name == data.procurementSpecialist,
+        (p) => p.id == data.procurementSpecialist.id,
       );
       selectedSupervisor.value = fleetSupervisors.firstWhereOrNull(
-        (f) => f.name == data.fleetSupervisor,
+        (f) => f.id == data.fleetSupervisor.id,
       );
 
       selectedSuppliers.value = data.suppliers;
@@ -300,7 +301,7 @@ class AddEditDialogController extends GetxController {
       }
     }
 
-    if(selectedStorages.isNotEmpty){
+    if(selectedSuppliers.isEmpty){
       Get.snackbar(
         'Error',
         'Please added at least one supplier',
@@ -359,9 +360,9 @@ class AddEditDialogController extends GetxController {
 
     final record = TripData(
       id: editData?.id ?? 0,
-      vehicleCode: selectedVehicle.value!.vehicleCode,
-      procurementSpecialist: selectedProcurementSpecialist.value!.name,
-      fleetSupervisor: selectedSupervisor.value!.name,
+      vehicle: selectedVehicle.value!,
+      procurementSpecialist: selectedProcurementSpecialist.value!,
+      fleetSupervisor: selectedSupervisor.value!,
       storages: selectedStorages,
       suppliers: selectedSuppliers,
       note: note.value,
@@ -375,7 +376,7 @@ class AddEditDialogController extends GetxController {
 
     Get.snackbar(
       'Success',
-      'Record ${mode == DialogMode.add ? 'added' : 'updated'} successfully with ${selectedStorages.length} storage(s) and ${selectedSuppliers.length} supplier(s)',
+      'trip ${mode == DialogMode.add ? 'added' : 'updated'} successfully with ${selectedStorages.length} storage(s) and ${selectedSuppliers.length} supplier(s)',
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );

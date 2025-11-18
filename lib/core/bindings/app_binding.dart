@@ -19,7 +19,7 @@ class AppBinding extends Bindings {
     Get.put(DropDownDataController());
     // Get.lazyPut(() => DropDownDataController(), fenix: true);
 
-    Get.put(UserService());
+    Get.lazyPut(()=>UserService());
 
     // 'fenix: true' ensures they are re-initialized
     // if they are ever removed from memory.

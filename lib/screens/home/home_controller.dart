@@ -4,19 +4,16 @@ import 'package:form_flow/core/data/constant/app_routes.dart';
 import 'package:form_flow/models/responses/delivery_summary_response.dart';
 import 'package:form_flow/models/user_model.dart';
 import 'package:form_flow/service/user_service.dart';
-import 'package:form_flow/widgets/dashboard_widgets/dashboard_controller.dart';
+import 'package:form_flow/screens/Dashboard/dashboard_controller.dart';
 import 'package:get/get.dart';
-import 'package:form_flow/models/delivery_model.dart';
 import 'package:intl/intl.dart';
-import '../../core/data/constant/Deliveries.dart';
 
 class HomeController extends GetxController {
   final deliveryController = Get.find<DeliveryController>();
 
   final userService = Get.find<UserService>();
 
- late final UserModel user =  userService.user! ;
-
+  late final UserModel user = userService.user!;
 
   // Observable variables
   final RxString searchQuery = ''.obs;
@@ -60,29 +57,23 @@ class HomeController extends GetxController {
     return filtered;
   }
 
-
-
   @override
   void onInit() {
     super.onInit();
-    loadDeliveries();  // call async method
-    loadUserInfo();
+    loadDeliveries(); // call async method
+    // loadUserInfo();
   }
 
   Future<void> loadDeliveries() async {
     deliveries.value = await deliveryController.handleDeliveriesSummary();
   }
 
-  Future<void> loadUserInfo() async {
-
-    if(userService.user != null){
-      throw "user is not empty";
-
-    // user = userService.user!;
-    }else{
+  Future<void> _loadUserInfo() async {
+    if (userService.user != null) {
+      // user = userService.user!;
+    } else {
       throw "user is empty";
     }
-
   }
 
   // Methods
@@ -105,8 +96,19 @@ class HomeController extends GetxController {
   //   deliveries.add(delivery);
   // }
 
-  void removeDelivery(int deliveryID) {
-    deliveries.removeWhere((delivery) => delivery.deliveryId == deliveryID);
+  void removeDelivery(int deliveryID) async {
+    if (await deliveryController.removeDelivery(deliveryID)) {
+      deliveries.removeWhere((delivery) => delivery.deliveryId == deliveryID);
+      Get.snackbar(
+        'Success',
+        'Delivery has been deleted "${deliveryID}" saved successfully!',
+        // 'Delivery "{finalDelivery.name}" saved successfully!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } else {
+      throw "the delivery has problem in deleting";
+    }
   }
 
   // put the edited
@@ -122,49 +124,27 @@ class HomeController extends GetxController {
       "data": null,
       "mode": DashboardControllerMode.addedNew,
     });
-    if (result != null) {
-      deliveries.add(result);
+    // to get the added delivery
+    loadDeliveries();
 
-      Get.snackbar(
-        'Success',
-        'Delivery "${result.name}" saved successfully!',
-        // 'Delivery "{finalDelivery.name}" saved successfully!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    }
+
   }
 
   // ✨ THIS IS THE METHOD TO CHANGE ✨
-  Future<void> onEditeDelivery(DeliverySummary data) async {
+  Future<void> onEditeDelivery(int deliveryID) async {
+    final deliveryController = Get.find<DeliveryController>();
+    final deliveryData = await deliveryController.fetchDelivery(deliveryID);
     // 1. Await the result from the dashboard screen
     final result = await Get.toNamed(
       AppRoutes.dashboard,
       arguments: {
-        "data": data,
+        "deliveryData": deliveryData,
         "mode": DashboardControllerMode.edit,
       },
     );
+    // get the delivery and update that one
+    loadDeliveries();
 
-    // 2. Check if the result is valid and update the list
-    if (result != null && result is DeliverySummary) {
-      // Find the index of the old delivery data using its unique ID
-      final index = deliveries.indexWhere((d) => d.deliveryId == result.deliveryId);
-
-      // If found, update it in the list
-      if (index != -1) {
-        // This will automatically refresh your UI because `deliveries` is an .obs list!
-        updateDelivery(index, result);
-      }
-
-      Get.snackbar(
-        'Success',
-        'Delivery "${result.deliveryName}" saved successfully!',
-        // 'Delivery "{finalDelivery.name}" saved successfully!',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    }
   }
 
   int getCrossAxisCount(double width) {

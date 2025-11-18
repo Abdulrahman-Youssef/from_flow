@@ -6,14 +6,14 @@ import 'package:intl/intl.dart';
 
 Widget buildDeliveryCard({
   required DeliverySummary delivery,
-  required void Function(DeliverySummary) onDeliveryTap,
+  required void Function(int deliveryID) onDeliveryTap,
   required void Function(int id) onDeleteTap, // Added delete callback
 }) {
   return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     child: InkWell(
-      onTap: () => onDeliveryTap(delivery),
+      onTap: () => onDeliveryTap(delivery.deliveryId),
       borderRadius: BorderRadius.circular(16),
       child: Padding(
         padding: const EdgeInsets.all(16),

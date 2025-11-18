@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:form_flow/controllers/delivery_controller.dart';
+import 'package:form_flow/models/API/delivery_api_model.dart';
+import 'package:form_flow/models/API/supplier_api_model.dart';
+import 'package:form_flow/models/API/trip_api_model.dart';
 import 'package:form_flow/models/delivery_model.dart';
 import 'package:form_flow/models/trip_data.dart';
 import 'package:form_flow/widgets/dashboard_widgets/dialog/add_edit_dialog.dart';
@@ -17,7 +21,10 @@ class DashboardController extends GetxController {
   final trips = <TripData>[].obs;
 
   // 1. Make deliveryName reactive
+  late int deliveryID;
+
   RxString deliveryName = ''.obs;
+  final Rx<DateTime> selectedDeliveryDate = DateTime(0).obs;
 
   // related to table header
   final totalSuppliers = 0.obs;
@@ -25,22 +32,26 @@ class DashboardController extends GetxController {
   final totalStorages = 0.obs;
 
   // DateTime? selectedDeliveryDate;
-  final DashboardControllerMode mode;
-  late DeliveryData? delivery;
+  late DashboardControllerMode mode;
+  late DeliveryData? editDelivery;
 
-  DashboardController({this.delivery, required this.mode});
-
-   final Rx<DateTime> selectedDeliveryDate = DateTime(0).obs;
-
+  DashboardController({this.editDelivery, required this.mode});
 
   @override
   void onInit() {
     super.onInit();
+    // for testing
+    // if(editDelivery == null ){
+    //   throw "edited is empty bro";
+    // }
+
+
     if (mode == DashboardControllerMode.edit) {
-      trips.assignAll(delivery!.trips);
+      trips.assignAll(editDelivery!.trips);
       // 2. Assign to .value
-      deliveryName.value = delivery!.name;
-      selectedDeliveryDate.value = delivery!.date;
+      deliveryName.value = editDelivery!.name;
+      selectedDeliveryDate.value = editDelivery!.date;
+      deliveryID = editDelivery!.id!;
     } else {
       // 2. Assign to .value
       deliveryName.value = "Delivery Name";
@@ -75,8 +86,8 @@ class DashboardController extends GetxController {
           deliveryName.value = textController.text;
           // delivery?.name =   textController.text;
         }
-        if (delivery != null) {
-          delivery = delivery!.copyWith(name: textController.text);
+        if (editDelivery != null) {
+          editDelivery = editDelivery!.copyWith(name: textController.text);
         }
 
         Get.back(closeOverlays: false); // Close the dialog
@@ -114,7 +125,7 @@ class DashboardController extends GetxController {
       middleText:
           'This will permanently delete the record for suppliers ${record.suppliers.map((sup) {
         return " ${sup.supplierName} ";
-      })} with Car ID ${record.vehicleCode}. This action cannot be undone.',
+      })} with Car ID ${record.vehicle}. This action cannot be undone.',
       textCancel: 'Cancel',
       textConfirm: 'Delete',
       confirmTextColor: Colors.white,
@@ -137,7 +148,7 @@ class DashboardController extends GetxController {
   void handleCopy(int id) {
     copyRecord(id);
     Get.snackbar(
-      duration: 650.milliseconds,
+      duration: 600.milliseconds,
       'Success',
       'Record copied successfully',
       backgroundColor: Colors.green,
@@ -148,40 +159,78 @@ class DashboardController extends GetxController {
 // In DashboardController
 // In DashboardController.dart
 
-  void saveAndExit() {
-    DeliveryData finalDelivery;
+  void saveAndExit() async {
+    if (trips.isEmpty) {
+      print("Error: No trips to save.");
+      return;
+    }
+    final deliveryController = Get.find<DeliveryController>();
+    late final DeliveryApiModel deliveryApi;
 
-    // Check which mode we are in
-    if (mode == DashboardControllerMode.edit) {
-      // EDIT MODE: Use the existing logic with the original delivery object
-      if (delivery == null) {
-        print("Error: In Edit Mode but no delivery data was provided.");
-        return; // Safety check
+    // Map UI trips to API trips
+    List<TripApiModel> apiTrips = trips.map((t) {
+      return TripApiModel(
+        vehicleId: t.vehicle.id,
+        // assuming all IDs are non-null
+        procurementSpecialistId: t.procurementSpecialist.id,
+        fleetSupervisorId: t.fleetSupervisor.id,
+        note: t.note,
+        storages: t.storages.map((s) => s.id!).toList(),
+        suppliers: t.suppliers.map((s) {
+          return SupplierApiModel(
+            supplierId: s.id!,
+            planArriveDate: s.planArriveDate.toString(),
+            actualArriveDate: s.actualArriveDate.toString(),
+            actualDepartureDate: s.actualDepartureDate.toString(),
+          );
+        }).toList(),
+      );
+    }).toList();
+
+    if (mode == DashboardControllerMode.addedNew) {
+      deliveryApi = DeliveryApiModel(
+        name: deliveryName.value,
+        date: selectedDeliveryDate.value.toIso8601String(),
+        trips: apiTrips,
+      );
+      deliveryID = await deliveryController.handleCreateUpdateDelivery(deliveryApi);
+
+      if (deliveryID != -1) {
+        mode = DashboardControllerMode.edit;
+
+        Get.snackbar(
+          'Success',
+          'Delivery "$deliveryName" saved successfully!',
+          // 'Delivery "{finalDelivery.name}" saved successfully!',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
       }
-      finalDelivery = delivery!.copyWith(
-        name: deliveryName.value,
-        date: selectedDeliveryDate.value,
-        // Make sure this is updated, e.g., selectedDate.value
-        trips: trips.toList(),
-      );
     } else {
-      // ADD NEW MODE: Create a brand new SupplyDeliveryData object
-      finalDelivery = DeliveryData(
-        // Generate a unique ID for the new delivery
-        id: DateTime.now().millisecondsSinceEpoch,
+      deliveryApi = DeliveryApiModel(
+        id: deliveryID,
         name: deliveryName.value,
-        date: selectedDeliveryDate.value ,
-        // Make sure this is set
-        trips: trips.toList(),
-        createdBy: 'Ahmed',
+        date: selectedDeliveryDate.value.toIso8601String(),
+        trips: apiTrips,
       );
+
+      if (await deliveryController.handleCreateUpdateDelivery(deliveryApi) != -1) {
+        Get.snackbar(
+          'Success',
+          'Delivery "$deliveryName" updated successfully!',
+          // 'Delivery "{finalDelivery.name}" saved successfully!',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        throw "save delivery is failed";
+      }
     }
 
-    // Return the new or updated object to the previous screen
-    Get.back(
-      result: finalDelivery,
-      closeOverlays: true,
-    );
+    // Return the API model ready to send
+    // Get.back(result: deliveryApi, closeOverlays: true);
+
+    // Get.back(closeOverlays: true);
   }
 
   void deleteRecord(int id) {
@@ -195,7 +244,7 @@ class DashboardController extends GetxController {
         : trips.map((e) => e.id).reduce((a, b) => a! > b! ? a : b)! + 1;
     final copiedRecord = record.copyWith(
       id: newId,
-      vehicleCode: record.vehicleCode,
+      vehicle: record.vehicle,
     );
     trips.add(copiedRecord);
   }
@@ -259,7 +308,7 @@ class DashboardController extends GetxController {
       String? savePath = await FilePicker.platform.saveFile(
         dialogTitle: 'Save CSV Export',
         fileName:
-        'supply-chain-trips-${DateFormat('yyyy-MM-dd').format(selectedDeliveryDate.value)}.csv',
+            'supply-chain-trips-${DateFormat('yyyy-MM-dd').format(selectedDeliveryDate.value)}.csv',
         type: FileType.custom,
         allowedExtensions: ['csv'],
       );
@@ -312,13 +361,13 @@ class DashboardController extends GetxController {
       final trip = trips[i];
       final supplierDetails = trip.suppliers
           .map((s) =>
-      '${s.supplierName} (${formatDateTime(s.actualArriveDate!)} - ${formatDateTime(s.actualDepartureDate!)})')
+              '${s.supplierName} (${formatDateTime(s.actualArriveDate!)} - ${formatDateTime(s.actualDepartureDate!)})')
           .join('; ');
       final storageDetails = trip.storages.map((s) => '${s.name}').join('; ');
 
       final row = [
         (i + 1).toString(),
-        trip.vehicleCode,
+        trip.vehicle,
         '"$storageDetails"',
         '"${trip.procurementSpecialist}"',
         '"${trip.fleetSupervisor}"',
@@ -335,12 +384,8 @@ class DashboardController extends GetxController {
   }
 
   void toggleExpansion(int index) {
-      trips[index].isExpanded = !trips[index].isExpanded;
+    trips[index].isExpanded = !trips[index].isExpanded;
 
-      trips.refresh();
+    trips.refresh();
   }
-
-
-
-
 }

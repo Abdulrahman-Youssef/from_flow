@@ -1,19 +1,27 @@
-class ServicesRoutes{
+class ServicesRoutes {
+  static const String register = "/register";
+  static const String login = "/login";
+  static const String logout = "/logout";
+  static const String user = "/user";
+  static const String profilePicture = "/profile-picture";
 
-  static String register = "/register";
-  static String login = "/login";
-  static String logout = "/logout";
-  static String user = "/user";
-  static String profilePicture = "/profile-picture";
-  static String deliveryDormData = "/delivery-form-data";
+  static const String deliveryDropData = "/delivery-form-data";
 
-  // deliveries
-  static final String _route = "/delivery";
+  // Base route
+  static const String deliveryBase = "/delivery";
 
-  static String deliveriesSummary = _route;
-  static String deliveryDetails = _route;
-  // static String login = "/login";
+  // GET /delivery
+  static String deliveriesSummary = deliveryBase;
 
+  // GET /delivery/{id}
+  static String deliveryDetails(int id) => "$deliveryBase/$id";
 
+  // POST /delivery
+  static String createDelivery = deliveryBase;
+
+  // PUT /delivery/{id}
+  static String updateDelivery(int id) => "$deliveryBase/$id";
+
+  // DELETE /delivery/{id}
+  static String deleteDelivery(int id) => "$deliveryBase/$id";
 }
-  // static String login = "/login";
