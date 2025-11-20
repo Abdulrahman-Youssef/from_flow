@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 Widget buildDeliveryCard({
   required DeliverySummary delivery,
   required void Function(int deliveryID) onDeliveryTap,
-  required void Function(int id) onDeleteTap, // Added delete callback
+  required void Function(int id) onDeleteTap,
 }) {
   return Card(
     elevation: 2,
@@ -54,7 +54,6 @@ Widget buildDeliveryCard({
                     ),
                   ),
                 ),
-                // **** START: DELETE BUTTON ADDED ****
                 SizedBox(
                   width: 28,
                   height: 28,
@@ -66,7 +65,6 @@ Widget buildDeliveryCard({
                     onPressed: () => onDeleteTap(delivery.deliveryId),
                   ),
                 ),
-                // **** END: DELETE BUTTON ADDED ****
               ],
             ),
 
@@ -79,8 +77,10 @@ Widget buildDeliveryCard({
                 color: Colors.grey.shade600,
               ),
             ),
+
             const SizedBox(height: 12),
-            // Stats Grid (no changes below this line)
+
+            // 2x2 Stats Grid
             Row(
               children: [
                 Expanded(
@@ -92,7 +92,7 @@ Widget buildDeliveryCard({
                     Colors.blue,
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 Expanded(
                   child: buildMiniStat(
                     delivery.suppliersCount.toString(),
@@ -104,20 +104,65 @@ Widget buildDeliveryCard({
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
                   child: buildMiniStat(
-                    delivery.tripsCount.toString(),
+                    delivery.vehiclesCount.toString(),
                     'Vehicles',
                     'مركبات',
                     Icons.local_shipping,
                     Colors.orange,
                   ),
                 ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: buildMiniStat(
+                    delivery.storagesCount.toString(),
+                    'Storages',
+                    'مخازن',
+                    Icons.warehouse,
+                    Colors.purple,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Divider
+            Divider(
+              color: Colors.grey.shade300,
+              thickness: 1,
+              height: 1,
+            ),
+
+            const SizedBox(height: 10),
+
+            // Created/Edited By Section
+            Row(
+              children: [
+                Icon(
+                  Icons.person_outline,
+                  size: 14,
+                  color: Colors.grey.shade600,
+                ),
                 const SizedBox(width: 6),
-                const Expanded(child: SizedBox()),
+                Expanded(
+                  child: Text(
+                    delivery.editedBy != null && delivery.editedBy!.isNotEmpty
+                        ? 'Created by ${delivery.createdBy} • Edited by ${delivery.editedBy}'
+                        : 'Created by ${delivery.createdBy}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                      fontStyle: FontStyle.italic,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ],

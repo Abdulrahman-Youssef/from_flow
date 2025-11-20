@@ -6,13 +6,13 @@ class DeliverySummary {
   final int createdByUserId;
   final String createdBy;
 
-  final int editedByUserId;
-  final String editedBy;
+  final int? editedByUserId;
+  final String? editedBy;
 
   final int tripsCount;
   final int suppliersCount;
   final int storagesCount;
-  final int vehicleCount;
+  final int vehiclesCount;
 
   DeliverySummary({
     required this.deliveryId,
@@ -20,12 +20,12 @@ class DeliverySummary {
     required this.deliveryDate,
     required this.createdByUserId,
     required this.createdBy,
-    required this.editedByUserId,
-    required this.editedBy,
+    this.editedByUserId,
+    this.editedBy,
     required this.tripsCount,
     required this.suppliersCount,
     required this.storagesCount,
-    required this.vehicleCount,
+    required this.vehiclesCount,
   });
 
   factory DeliverySummary.fromJson(Map<String, dynamic> json) {
@@ -40,7 +40,7 @@ class DeliverySummary {
       tripsCount: json['trips_count'],
       suppliersCount: json['suppliers_count'],
       storagesCount: json['storages_count'],
-      vehicleCount: json['vehicle_count'],
+      vehiclesCount: json['vehicle_count'],
     );
   }
 
@@ -56,7 +56,7 @@ class DeliverySummary {
       'trips_count': tripsCount,
       'suppliers_count': suppliersCount,
       'storages_count': storagesCount,
-      'vehicle_count': vehicleCount,
+      'vehicle_count': vehiclesCount,
     };
   }
 }
