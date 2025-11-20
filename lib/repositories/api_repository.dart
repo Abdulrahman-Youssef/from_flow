@@ -31,8 +31,8 @@ class ApiRepository {
   // 6. The setup method for Dio
   void _setupDio() {
     _dio.options.baseUrl = _baseUrl;
-    _dio.options.connectTimeout = Duration(milliseconds: 5000);
-    _dio.options.receiveTimeout = Duration(milliseconds: 3000);
+    _dio.options.connectTimeout = Duration(seconds: 10);
+    _dio.options.receiveTimeout = Duration(seconds: 10);
     _dio.options.headers['Accept'] = 'application/json';
 
     // 7. Add the Interceptor

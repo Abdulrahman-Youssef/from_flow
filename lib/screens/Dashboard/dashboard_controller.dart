@@ -308,7 +308,7 @@ class DashboardController extends GetxController {
       String? savePath = await FilePicker.platform.saveFile(
         dialogTitle: 'Save CSV Export',
         fileName:
-            'supply-chain-trips-${DateFormat('yyyy-MM-dd').format(selectedDeliveryDate.value)}.csv',
+        '${deliveryName.value}-${DateFormat('yyyy-MM-dd').format(selectedDeliveryDate.value)}.csv',
         type: FileType.custom,
         allowedExtensions: ['csv'],
       );
@@ -326,7 +326,7 @@ class DashboardController extends GetxController {
 
       Get.snackbar(
         'Success',
-        'Excel file exported successfully to: ${file.path}',
+        'CSV file exported successfully to: ${file.path}',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
@@ -341,47 +341,60 @@ class DashboardController extends GetxController {
   }
 
   String generateCsvContent() {
+    final csvContent = StringBuffer();
+
+    // Add delivery name header as a title row
+    csvContent.writeln('"${deliveryName.value}"');
+    csvContent.writeln('"Date: ${DateFormat('dd/MM/yyyy').format(selectedDeliveryDate.value)}"');
+    csvContent.writeln(''); // Empty row for spacing
+
+    // Column headers
     final headers = [
       'Trip #',
-      'Vehicle NO',
-      'Storage Name',
+      'Vehicle',
+      'Storages Names',
+      'Suppliers Names',
       'Procurement Specialist',
       'Fleet Supervisor',
-      'Suppliers Count',
-      'Earliest Arrival',
-      'Latest Departure',
       'Total Trip Time',
-      'Supplier Details'
+      'Notes'
     ];
 
-    final csvContent = StringBuffer();
     csvContent.writeln(headers.join(','));
 
+    // Data rows
     for (int i = 0; i < trips.length; i++) {
       final trip = trips[i];
-      final supplierDetails = trip.suppliers
-          .map((s) =>
-              '${s.supplierName} (${formatDateTime(s.actualArriveDate!)} - ${formatDateTime(s.actualDepartureDate!)})')
+
+      // Safely access vehicle name/number
+      final vehicleNo = trip.vehicle.vehicleCode ?? trip.vehicle.id.toString();
+
+      // Get all storage names
+      final storagesNames = trip.storages
+          .map((s) => s.name ?? 'Unknown')
           .join('; ');
-      final storageDetails = trip.storages.map((s) => '${s.name}').join('; ');
+
+      // Get all supplier names
+      final suppliersNames = trip.suppliers
+          .map((s) => s.supplierName)
+          .join('; ');
 
       final row = [
         (i + 1).toString(),
-        trip.vehicle,
-        '"$storageDetails"',
-        '"${trip.procurementSpecialist}"',
-        '"${trip.fleetSupervisor}"',
-        trip.suppliers.length.toString(),
-        '"${formatDateTime(trip.earliestArrival!)}"',
-        '"${formatDateTime(trip.latestDeparture!)}"',
-        trip.totalWaitingTime,
-        '"$supplierDetails"'
+        '"$vehicleNo"',
+        '"$storagesNames"',
+        '"$suppliersNames"',
+        '"${trip.procurementSpecialist.name ?? 'Unknown'}"',
+        '"${trip.fleetSupervisor.name ?? 'Unknown'}"',
+        '"${trip.totalWaitingTime ?? 'N/A'}"',
+        '"${trip.note ?? ''}"'
       ];
       csvContent.writeln(row.join(','));
     }
 
     return csvContent.toString();
   }
+
 
   void toggleExpansion(int index) {
     trips[index].isExpanded = !trips[index].isExpanded;

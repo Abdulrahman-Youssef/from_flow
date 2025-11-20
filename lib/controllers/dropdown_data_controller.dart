@@ -17,14 +17,14 @@ class DropDownDataController extends GetxController {
   late final List<FleetSupervisorsModel> fleetSupervisors;
 
   late final List<ProcurementSpecialistsModel> procurementSpecialists;
-
+  //
   @override
   void onInit() {
     super.onInit();
-    _fetchData();
+    fetchData();
   }
 
-  Future<void> _fetchData() async {
+  Future<void> fetchData() async {
     DeliveryRepository deliveryRepository = DeliveryRepository();
 
     try {
@@ -35,7 +35,6 @@ class DropDownDataController extends GetxController {
       suppliers = response.suppliers;
       storages = response.storages;
       vehicles = response.vehicles;
-      print("from dropdown_data_controller: ${vehicles.length}");
       fleetSupervisors=response.fleetSupervisors;
       procurementSpecialists=response.procurementSpecialists;
 
